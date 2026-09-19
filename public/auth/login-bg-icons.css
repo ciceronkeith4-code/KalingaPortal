@@ -1,0 +1,336 @@
+/* ==========================================================================
+   LoginBackgroundIcons - Decorative Ambient Health Icons Layer
+   Barangay 603 Kalinga Portal
+   Purely visual background layer; non-interactive; GPU-accelerated.
+   ========================================================================== */
+
+:root {
+  --bg-icon-navy: #0F1A4D;   /* Matches headline color */
+  --bg-icon-red:  #E01E1E;   /* Matches Kalinga accent / button red */
+}
+
+/* ---------- Full-viewport Decorative Container ---------- */
+.bg-icons-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 1; /* Sits behind header (z-index 30) and hero content (z-index 10) */
+  user-select: none;
+}
+
+/* ---------- Base Icon Wrapper (Entrance & Positioning) ---------- */
+.bg-icon {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--bg-icon-navy);
+  opacity: 0; /* Starts hidden to avoid any flash of unstyled content */
+  transform: translate3d(0, 12px, 0) scale(0.85);
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+}
+
+/* Accent Red Variant */
+.bg-icon--accent {
+  color: var(--bg-icon-red);
+}
+
+/* ---------- Entrance Animation (Triggered when .is-ready is added) ---------- */
+.bg-icons-container.is-ready .bg-icon {
+  animation: bgIconEntrance 820ms cubic-bezier(0.22, 1, 0.36, 1) var(--anim-delay, 0ms) forwards;
+}
+
+@keyframes bgIconEntrance {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 12px, 0) scale(0.85);
+  }
+  100% {
+    opacity: var(--target-opacity, 0.16);
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+/* ---------- Floating Idle Animation (GPU transform) ---------- */
+.bg-icon__inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: bgIconFloat var(--float-dur, 7.5s) ease-in-out var(--float-delay, 0s) infinite alternate;
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+@keyframes bgIconFloat {
+  0% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+  100% {
+    transform: translate3d(0, var(--float-y, -8px), 0) rotate(var(--float-rot, 3deg));
+  }
+}
+
+/* ---------- Icon SVG Styling ---------- */
+.bg-icon svg {
+  display: block;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+}
+
+/* ==========================================================================
+   Icon Coordinates & Animation Variations (Asymmetric & Safe from Form)
+   Form occupies center: roughly left: calc(50% - 250px) to calc(50% + 250px)
+   Header logo occupies top-left (left: 48px, top: 22px)
+   ========================================================================== */
+
+/* --- Left Flank Icons --- */
+
+/* 1. Stethoscope (Navy, Upper Left) */
+.bg-icon--stethoscope {
+  top: 17%;
+  left: 13%;
+  --target-opacity: 0.16;
+  --anim-delay: 0ms;
+}
+.bg-icon--stethoscope .bg-icon__inner {
+  --float-dur: 7.2s;
+  --float-delay: -1.2s;
+  --float-y: -8px;
+  --float-rot: 3deg;
+}
+
+/* 2. Heart with Pulse Line (Accent Red, Mid-Upper Left) */
+.bg-icon--heart-pulse {
+  top: 35%;
+  left: 5%;
+  --target-opacity: 0.20;
+  --anim-delay: 310ms;
+}
+.bg-icon--heart-pulse .bg-icon__inner {
+  --float-dur: 6.8s;
+  --float-delay: -2.8s;
+  --float-y: 9px;
+  --float-rot: -3.5deg;
+}
+
+/* 3. Clipboard Health Record (Navy, Mid Left) */
+.bg-icon--clipboard {
+  top: 53%;
+  left: 17%;
+  --target-opacity: 0.15;
+  --anim-delay: 540ms;
+}
+.bg-icon--clipboard .bg-icon__inner {
+  --float-dur: 8.4s;
+  --float-delay: -0.6s;
+  --float-y: -7px;
+  --float-rot: 2.5deg;
+}
+
+/* 4. Medicine Capsule (Accent Red, Lower-Mid Left) */
+.bg-icon--capsule {
+  top: 69%;
+  left: 7%;
+  --target-opacity: 0.19;
+  --anim-delay: 160ms;
+}
+.bg-icon--capsule .bg-icon__inner {
+  --float-dur: 7.6s;
+  --float-delay: -3.5s;
+  --float-y: 8px;
+  --float-rot: 4deg;
+}
+
+/* 5. House / Barangay Community (Navy, Bottom Left) */
+.bg-icon--house {
+  top: 84%;
+  left: 16%;
+  --target-opacity: 0.15;
+  --anim-delay: 620ms;
+}
+.bg-icon--house .bg-icon__inner {
+  --float-dur: 8.8s;
+  --float-delay: -1.8s;
+  --float-y: -6px;
+  --float-rot: -2.5deg;
+}
+
+/* 6. Thermometer (Navy, Left Inset) */
+.bg-icon--thermometer {
+  top: 25%;
+  left: 23%;
+  --target-opacity: 0.14;
+  --anim-delay: 770ms;
+}
+.bg-icon--thermometer .bg-icon__inner {
+  --float-dur: 6.4s;
+  --float-delay: -4.1s;
+  --float-y: 7px;
+  --float-rot: -3deg;
+}
+
+/* --- Right Flank Icons --- */
+
+/* 7. Shield with Check (Navy, Top Right) */
+.bg-icon--shield-check {
+  top: 15%;
+  left: 81%;
+  --target-opacity: 0.17;
+  --anim-delay: 80ms;
+}
+.bg-icon--shield-check .bg-icon__inner {
+  --float-dur: 7.9s;
+  --float-delay: -2.1s;
+  --float-y: -9px;
+  --float-rot: -3deg;
+}
+
+/* 8. First-Aid Cross (Accent Red, Upper-Mid Right) */
+.bg-icon--cross {
+  top: 31%;
+  left: 90%;
+  --target-opacity: 0.20;
+  --anim-delay: 470ms;
+}
+.bg-icon--cross .bg-icon__inner {
+  --float-dur: 6.6s;
+  --float-delay: -0.9s;
+  --float-y: 8px;
+  --float-rot: 3.5deg;
+}
+
+/* 9. Medical Bag (Navy, Mid Right) */
+.bg-icon--med-bag {
+  top: 48%;
+  left: 78%;
+  --target-opacity: 0.16;
+  --anim-delay: 700ms;
+}
+.bg-icon--med-bag .bg-icon__inner {
+  --float-dur: 8.6s;
+  --float-delay: -3.2s;
+  --float-y: -8px;
+  --float-rot: 2.5deg;
+}
+
+/* 10. Syringe (Navy, Lower-Mid Right) */
+.bg-icon--syringe {
+  top: 64%;
+  left: 89%;
+  --target-opacity: 0.15;
+  --anim-delay: 390ms;
+}
+.bg-icon--syringe .bg-icon__inner {
+  --float-dur: 7.4s;
+  --float-delay: -1.5s;
+  --float-y: 7px;
+  --float-rot: -4deg;
+}
+
+/* 11. Calendar / Schedules (Navy, Lower Right) */
+.bg-icon--calendar {
+  top: 79%;
+  left: 76%;
+  --target-opacity: 0.15;
+  --anim-delay: 230ms;
+}
+.bg-icon--calendar .bg-icon__inner {
+  --float-dur: 8.2s;
+  --float-delay: -4.5s;
+  --float-y: -7px;
+  --float-rot: 3deg;
+}
+
+/* 12. Medicine Bottle (Navy, Bottom Far Right) */
+.bg-icon--bottle {
+  top: 86%;
+  left: 88%;
+  --target-opacity: 0.14;
+  --anim-delay: 840ms;
+}
+.bg-icon--bottle .bg-icon__inner {
+  --float-dur: 6.9s;
+  --float-delay: -2.3s;
+  --float-y: 6px;
+  --float-rot: -2.5deg;
+}
+
+/* ==========================================================================
+   Responsive Adaptations
+   ========================================================================== */
+
+/* Tablet Screens (≤1024px): Show 6 icons, pushed towards outer edges */
+@media (max-width: 1024px) {
+  /* Hide the 6 inner/secondary icons */
+  .bg-icon--thermometer,
+  .bg-icon--house,
+  .bg-icon--capsule,
+  .bg-icon--med-bag,
+  .bg-icon--syringe,
+  .bg-icon--bottle {
+    display: none !important;
+  }
+
+  /* Push the 6 remaining icons towards extreme edges to give ample room to the form */
+  .bg-icon--stethoscope {
+    top: 14%;
+    left: 4%;
+  }
+
+  .bg-icon--heart-pulse {
+    top: 48%;
+    left: 3%;
+  }
+
+  .bg-icon--clipboard {
+    top: 80%;
+    left: 5%;
+  }
+
+  .bg-icon--shield-check {
+    top: 14%;
+    left: 88%;
+  }
+
+  .bg-icon--cross {
+    top: 46%;
+    left: 89%;
+  }
+
+  .bg-icon--calendar {
+    top: 78%;
+    left: 87%;
+  }
+}
+
+/* Mobile Screens (≤640px): Hide decorative icons entirely to prevent any clutter or overlap */
+@media (max-width: 640px) {
+  .bg-icons-container {
+    display: none !important;
+  }
+}
+
+/* ==========================================================================
+   Accessibility: prefers-reduced-motion
+   Show icons statically at final opacity with zero movement
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  .bg-icons-container .bg-icon {
+    animation: none !important;
+    opacity: var(--target-opacity, 0.16) !important;
+    transform: translate3d(0, 0, 0) scale(1) !important;
+  }
+
+  .bg-icons-container .bg-icon__inner {
+    animation: none !important;
+    transform: none !important;
+  }
+}

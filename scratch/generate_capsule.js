@@ -1,0 +1,84 @@
+const fs = require('fs');
+
+const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="100%" height="100%" role="img" aria-label="3D Medical Capsule in Navy and Red">
+  <defs>
+    <!-- 3D Cylindrical Gradient for Navy Half -->
+    <linearGradient id="navy3D" x1="0.1" y1="0.1" x2="0.9" y2="0.9">
+      <stop offset="0%" stop-color="#4B68FA"/>
+      <stop offset="20%" stop-color="#2A3FA8"/>
+      <stop offset="55%" stop-color="#1B2A80"/>
+      <stop offset="85%" stop-color="#101B5C"/>
+      <stop offset="100%" stop-color="#0A1138"/>
+    </linearGradient>
+
+    <!-- 3D Cylindrical Gradient for Red Half -->
+    <linearGradient id="red3D" x1="0.1" y1="0.1" x2="0.9" y2="0.9">
+      <stop offset="0%" stop-color="#FF6B6B"/>
+      <stop offset="25%" stop-color="#F04040"/>
+      <stop offset="60%" stop-color="#D31515"/>
+      <stop offset="88%" stop-color="#B30000"/>
+      <stop offset="100%" stop-color="#730000"/>
+    </linearGradient>
+
+    <!-- Glossy Specular Gradients -->
+    <linearGradient id="specularGloss" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.9"/>
+      <stop offset="60%" stop-color="#FFFFFF" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+
+    <linearGradient id="rimLight" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+
+    <!-- Soft Lower Edge Shadow for 3D Volume -->
+    <linearGradient id="volumeShadow" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#000000" stop-opacity="0"/>
+      <stop offset="70%" stop-color="#000000" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0.45"/>
+    </linearGradient>
+
+    <radialGradient id="softDomeHighlight" cx="35%" cy="30%" r="45%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.75"/>
+      <stop offset="50%" stop-color="#FFFFFF" stop-opacity="0.2"/>
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Capsule tilted 45 degrees upward-right -->
+  <g transform="rotate(45 250 250)">
+    
+    <!-- Top Half (Navy Blue) -->
+    <g id="navy-half">
+      <path d="M 160 250 L 160 160 A 90 90 0 0 1 340 160 L 340 250 C 295 272, 205 272, 160 250 Z" fill="url(#navy3D)"/>
+      <!-- Inner volume shadow on lower/right flank -->
+      <path d="M 160 250 L 160 160 A 90 90 0 0 1 340 160 L 340 250 C 295 272, 205 272, 160 250 Z" fill="url(#volumeShadow)"/>
+      <!-- Soft dome highlight on the top cap -->
+      <path d="M 165 160 A 85 85 0 0 1 335 160 C 335 190, 165 190, 165 160 Z" fill="url(#softDomeHighlight)"/>
+      <!-- Elongated glossy white highlight along top-left flank -->
+      <path d="M 175 145 C 175 110, 200 95, 230 92 C 205 98, 185 115, 182 150 C 180 185, 182 230, 184 245 C 178 240, 175 200, 175 145 Z" fill="url(#specularGloss)"/>
+      <ellipse cx="215" cy="108" rx="24" ry="10" transform="rotate(-30 215 108)" fill="#FFFFFF" opacity="0.6"/>
+    </g>
+
+    <!-- Bottom Half (Red) -->
+    <g id="red-half">
+      <path d="M 160 250 L 160 340 A 90 90 0 0 0 340 340 L 340 250 C 295 272, 205 272, 160 250 Z" fill="url(#red3D)"/>
+      <!-- Inner volume shadow on lower/right flank -->
+      <path d="M 160 250 L 160 340 A 90 90 0 0 0 340 340 L 340 250 C 295 272, 205 272, 160 250 Z" fill="url(#volumeShadow)"/>
+      <!-- Elongated glossy white highlight along left edge -->
+      <path d="M 175 260 C 174 290, 176 345, 210 385 C 195 365, 183 330, 183 290 C 183 270, 182 258, 180 255 C 176 256, 175 258, 175 260 Z" fill="url(#specularGloss)"/>
+      <ellipse cx="205" cy="380" rx="18" ry="8" transform="rotate(35 205 380)" fill="#FFFFFF" opacity="0.5"/>
+    </g>
+
+    <!-- Thin Seam Where Halves Meet -->
+    <!-- Seam shadow -->
+    <path d="M 160 250 C 205 273, 295 273, 340 250" fill="none" stroke="rgba(10, 17, 56, 0.6)" stroke-width="2.5" stroke-linecap="round"/>
+    <!-- Seam light reflection -->
+    <path d="M 160 251.5 C 205 274.5, 295 274.5, 340 251.5" fill="none" stroke="rgba(255, 255, 255, 0.3)" stroke-width="1" stroke-linecap="round"/>
+
+  </g>
+</svg>`;
+
+fs.writeFileSync('c:/Users/ADMIN/OneDrive/Desktop/keith projects/Kalinga Portal/assets/capsule.svg', svg);
+console.log('Saved capsule.svg successfully');

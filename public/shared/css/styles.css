@@ -1,0 +1,611 @@
+/* ==========================================================================
+   Kalinga Portal - Barangay 603 Health Portal
+   Polished Reference-Matched Design (Navy & Red Palette)
+   Left Side & Layout 100% Preserved; Right Column Redesigned with Authentic Civic Information
+   (Zero AI Templating, No 3D Plastic Toys, No Cards, No Unnecessary Icons)
+   ========================================================================== */
+
+/* ---------- CSS Reset & Tokens ---------- */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  /* Capsule-Matched Color Palette */
+  --navy-darkest:  #0A1138;
+  --navy-dark:     #101B5C;
+  --navy-primary:  #1B2A80;
+  --navy-light:    #2A3FA8;
+  --navy-subtle:   #EEF2FF;
+
+  --red-primary:   #E01E1E;
+  --red-dark:      #B30000;
+  --red-glow:      rgba(224, 30, 30, 0.38);
+
+  --text-headline: #0F1A4D;   /* Dark navy headline (14:1 contrast on white) */
+  --text-body:     #5B6275;   /* Clear gray body text (WCAG AA compliant) */
+  --text-label:    #0F1A4D;
+
+  --border-field:  #9AA3B5;   /* 1.5px visible high-contrast border */
+  --border-focus:  #1B2A80;
+
+  --error-text:    #991B1B;
+  --error-bg:      #FEF2F2;
+  --error-border:  #FCA5A5;
+
+  --font-family:   'Poppins', system-ui, -apple-system, sans-serif;
+  --radius-md:     10px;
+  --radius-pill:   9999px;
+}
+
+html, body {
+  width: 100%;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+body {
+  font-family: var(--font-family);
+  font-size: 1rem;            /* 16px base font */
+  line-height: 1.55;
+  color: var(--text-body);
+  background-color: #FFFFFF;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------- Main Split Layout Container ---------- */
+.landing-layout {
+  position: relative;
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  background-color: #FFFFFF;
+  overflow: hidden;
+}
+
+/* ==========================================================================
+   Top Navigation Bar (Snug padding, no huge spaces)
+   ========================================================================== */
+.top-nav {
+  position: relative;
+  z-index: 30;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 22px 48px 4px;
+  animation: navEntrance 0.6s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+
+.brand-identity {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.brand-identity:hover {
+  transform: translateY(-1px);
+}
+
+.brand-logo-mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.brand-logo-img {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+  box-shadow: 0 2px 8px rgba(15, 26, 77, 0.16);
+  border: 1.5px solid rgba(27, 42, 128, 0.15);
+  transition: transform 0.3s cubic-bezier(0.34, 1.4, 0.64, 1), box-shadow 0.3s ease;
+}
+
+.brand-identity:hover .brand-logo-img {
+  transform: scale(1.08) rotate(-3deg);
+  box-shadow: 0 6px 16px rgba(15, 26, 77, 0.22);
+}
+
+.brand-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-headline);
+  letter-spacing: -0.01em;
+  transition: color 0.2s ease;
+}
+
+.brand-identity:hover .brand-title {
+  color: var(--navy-primary);
+}
+
+
+
+/* ==========================================================================
+   Angled Navy Panel Architecture (Crisp layered shapes)
+   ========================================================================== */
+.navy-panel-backdrop {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 54%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+  overflow: hidden;
+}
+
+/* Crisp Darker Offset Layer for depth */
+.navy-offset-depth-layer {
+  position: absolute;
+  top: 0;
+  left: 7%;
+  width: 100%;
+  height: 100%;
+  background-color: var(--navy-darkest);
+  border-radius: 52px 0 0 0;
+  box-shadow: none;
+}
+
+/* Main angled navy gradient panel */
+.navy-main-angled-panel {
+  position: absolute;
+  top: 0;
+  left: 11%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, var(--navy-light) 0%, var(--navy-primary) 50%, var(--navy-dark) 100%);
+  border-radius: 52px 0 0 0;
+  box-shadow: -10px 0 28px rgba(10, 17, 56, 0.4);
+}
+
+/* ==========================================================================
+   Hero Stage Grid (Snug vertical flow, no huge empty gaps)
+   ========================================================================== */
+.hero-stage {
+  position: relative;
+  z-index: 10;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 24px 44px;
+}
+
+.hero-content-grid {
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ---------- Form Column: Content & Login Form ---------- */
+.left-form-column {
+  z-index: 5;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.content-wrapper {
+  max-width: 480px;
+  width: 100%;
+}
+
+/* Bold Two-Line Headline with Clean Pop-Out Entrance */
+.hero-headline {
+  font-size: 2.75rem;
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: var(--text-headline);
+  margin-bottom: 14px;
+  text-align: center;
+  animation: loginPopOut 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.08s backwards;
+  will-change: transform, opacity;
+}
+
+.text-accent {
+  color: var(--red-primary);
+  display: inline-block;
+  transition: transform 0.3s cubic-bezier(0.34, 1.4, 0.64, 1), text-shadow 0.3s ease;
+}
+
+.hero-headline:hover .text-accent {
+  transform: scale(1.05);
+  text-shadow: 0 2px 14px rgba(224, 30, 30, 0.25);
+}
+
+.hero-description {
+  font-size: 0.96875rem;
+  line-height: 1.6;
+  color: var(--text-body);
+  margin-bottom: 22px;        /* Snug spacing */
+  text-align: center;
+  animation: loginPopOut 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.16s backwards;
+  will-change: transform, opacity;
+}
+
+/* Form Inputs & Accessible Controls with Smooth Pop-Out */
+.input-field-group {
+  margin-bottom: 16px;        /* Snug spacing between fields */
+  animation: loginPopOut 0.7s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  will-change: transform, opacity;
+}
+
+.input-field-group:nth-of-type(1) {
+  animation-delay: 0.24s;
+}
+
+.input-field-group:nth-of-type(2) {
+  animation-delay: 0.32s;
+}
+
+.input-field-group label {
+  display: block;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--text-label);
+  margin-bottom: 6px;
+  transition: color 0.25s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.input-field-group:focus-within label {
+  color: var(--navy-primary);
+  transform: translateX(2px);
+}
+
+.input-field-group input {
+  width: 100%;
+  height: 50px;
+  min-height: 50px;
+  padding: 10px 16px;
+  border: 1.5px solid var(--border-field);
+  border-radius: var(--radius-md);
+  font-family: inherit;
+  font-size: 0.96875rem;
+  color: var(--text-headline);
+  background-color: #FFFFFF;
+  outline: none;
+  letter-spacing: normal;
+  word-spacing: normal;
+  transition: border-color 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+              background-color 0.2s ease;
+}
+
+.input-field-group input::placeholder {
+  color: #4B5563;
+  font-size: 0.9375rem;
+  letter-spacing: normal;
+  transition: color 0.2s ease;
+}
+
+.input-field-group input:hover {
+  border-color: #6C7A9C;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(15, 26, 77, 0.06);
+}
+
+.input-field-group input:focus {
+  border-color: var(--navy-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(27, 42, 128, 0.12), 0 0 0 4px rgba(27, 42, 128, 0.18);
+}
+
+/* Show Password & Forgot Password Row with Smooth Pop-Out */
+.form-aux-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 2px;
+  margin-bottom: 20px;
+  animation: loginPopOut 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.40s backwards;
+  will-change: transform, opacity;
+}
+
+.show-password-field {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--text-headline);
+  transition: color 0.2s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.show-password-field:hover {
+  color: var(--navy-primary);
+  transform: translateX(2px);
+}
+
+/* 22px Accessible Checkbox with Smooth Pop */
+.show-password-field input[type="checkbox"] {
+  width: 22px;
+  height: 22px;
+  min-width: 22px;
+  min-height: 22px;
+  accent-color: var(--navy-primary);
+  cursor: pointer;
+  transition: transform 0.22s cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+
+.show-password-field:hover input[type="checkbox"] {
+  transform: scale(1.12);
+}
+
+.forgot-password-link {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--navy-primary);
+  text-decoration: none;
+  display: inline-block;
+  transition: color 0.2s ease, transform 0.25s cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+
+.forgot-password-link:hover,
+.forgot-password-link:focus-visible {
+  color: var(--red-primary);
+  transform: translateY(-1.5px) scale(1.03);
+  text-decoration: underline;
+  outline: none;
+}
+
+/* Plain-Language Error Message Banner with Smooth Pop-Out */
+.error-banner[hidden] {
+  display: none;
+}
+
+.error-banner {
+  margin: 0 0 16px;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  background-color: var(--error-bg);
+  border: 1.5px solid var(--error-border);
+  color: var(--error-text);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.4;
+  animation: errorPopOut 0.35s cubic-bezier(0.34, 1.4, 0.64, 1) forwards;
+}
+
+/* Primary Sign In Button Row & Smooth Button Pop-Out */
+.button-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.sign-in-btn {
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  height: 50px;
+  min-height: 50px;
+  padding: 0 36px;
+  border-radius: var(--radius-pill);
+  border: none;
+  background-color: var(--red-primary);
+  color: #FFFFFF;
+  font-family: inherit;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: 0 10px 24px var(--red-glow);
+  animation: btnPopOutEntrance 0.78s cubic-bezier(0.34, 1.35, 0.64, 1) 0.48s backwards;
+  will-change: transform, box-shadow;
+  transition: background-color 0.2s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Subtle Shimmer Sheen on Button */
+.sign-in-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.28) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: skewX(-25deg);
+  transition: left 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+}
+
+.sign-in-btn:hover::before {
+  left: 140%;
+}
+
+.sign-in-btn:hover {
+  background-color: var(--red-dark);
+  box-shadow: 0 16px 32px rgba(224, 30, 30, 0.44), 0 4px 12px rgba(224, 30, 30, 0.26);
+  transform: translateY(-3px) scale(1.035);
+}
+
+.sign-in-btn:hover .btn-arrow-icon {
+  transform: translateX(5px);
+}
+
+.sign-in-btn:active {
+  transform: translateY(0px) scale(0.98);
+  background-color: var(--red-dark);
+  box-shadow: 0 6px 16px rgba(179, 0, 0, 0.35);
+  transition-duration: 0.1s;
+}
+
+.sign-in-btn:focus-visible {
+  outline: 3px solid var(--navy-primary);
+  outline-offset: 3px;
+}
+
+.sign-in-btn:disabled {
+  background-color: #94A3B8;
+  box-shadow: none;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-arrow-icon {
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+
+
+/* ==========================================================================
+   Responsive Adaptations (360px, 768px, 1024px, 1440px)
+   ========================================================================== */
+@media (max-width: 1200px) {
+  .hero-headline {
+    font-size: 2.35rem;
+  }
+}
+
+/* Tablet & Mobile Screens (880px and below) */
+@media (max-width: 880px) {
+  .top-nav {
+    padding: 16px 24px;
+  }
+
+  .hero-stage {
+    padding: 12px 24px 36px;
+  }
+
+  .hero-content-grid {
+    gap: 24px;
+  }
+
+  .content-wrapper {
+    max-width: 100%;
+  }
+
+  .hero-headline {
+    font-size: 2.1rem;
+  }
+}
+
+/* Extra Small Mobile (480px) */
+@media (max-width: 480px) {
+  .hero-headline {
+    font-size: 1.75rem;
+  }
+
+  .sign-in-btn {
+    width: 100%;
+  }
+
+  .form-aux-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+}
+
+/* ==========================================================================
+   Clean & Smooth Pop-Out Keyframes
+   ========================================================================== */
+@keyframes navEntrance {
+  0% {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes loginPopOut {
+  0% {
+    opacity: 0;
+    transform: translateY(22px) scale(0.95);
+  }
+  65% {
+    opacity: 1;
+    transform: translateY(-2px) scale(1.012);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes btnPopOutEntrance {
+  0% {
+    opacity: 0;
+    transform: translateY(26px) scale(0.86);
+    box-shadow: 0 4px 10px rgba(224, 30, 30, 0);
+  }
+  65% {
+    opacity: 1;
+    transform: translateY(-4px) scale(1.045);
+    box-shadow: 0 16px 32px rgba(224, 30, 30, 0.45);
+  }
+  85% {
+    transform: translateY(1px) scale(0.99);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    box-shadow: 0 10px 24px var(--red-glow);
+  }
+}
+
+@keyframes errorPopOut {
+  0% {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Accessibility: Respect Reduced Motion Preferences */
+@media (prefers-reduced-motion: reduce) {
+  .top-nav,
+  .hero-headline,
+  .hero-description,
+  .input-field-group,
+  .form-aux-row,
+  .sign-in-btn,
+  .error-banner,
+  .brand-identity,
+  .brand-logo-img,
+  .text-accent,
+  .show-password-field,
+  .show-password-field input[type="checkbox"],
+  .forgot-password-link {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
