@@ -167,25 +167,7 @@ document.addEventListener('DOMContentLoaded', () => {
       showToast('Prescription requested.');
     });
   }
-
-  const schForm = document.getElementById('sch-request-form');
-  if (schForm) {
-    schForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const patient = getMyPatient();
-      if (!patient) return;
-      const date = document.getElementById('sch-request-date').value;
-      const time = document.getElementById('sch-request-time').value;
-      const reason = document.getElementById('sch-request-reason').value.trim();
-      if (!date || !time) return;
-
-      PatientStore.requestAppointment(patient.id, date, time, reason);
-      schForm.reset();
-      renderSchedule();
-      renderDashboardStats();
-      showToast('Appointment requested.');
-    });
-  }
+ 
 
   document.addEventListener('kalinga:viewchange', (e) => {
     if (e.detail.view === 'dashboard') renderDashboardStats();
