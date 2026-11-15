@@ -441,23 +441,7 @@ function renderPrescriptionsTable(searchQuery = '') {
       });
       actionsTd.appendChild(printBtn);
 
-      // Remove button
-      const removeBtn = makeIconRowBtn({ action: 'remove', label: 'Remove prescription', extraClass: 'danger' });
-      removeBtn.addEventListener('click', async (e) => {
-        e.stopPropagation();
-        const ok = await confirmDialog({
-          title: 'Remove Prescription?',
-          message: `Are you sure you want to remove this prescription for ${rx.patientName}? This cannot be undone.`,
-          confirmLabel: 'Yes, Remove',
-          danger: true
-        });
-        if (!ok) return;
-        PatientStore.deletePrescription(rx.patientId, rx.id);
-        renderPrescriptionsTable(document.getElementById('rx-table-search')?.value.trim() || '');
-        renderDashboardStats();
-        showToast('Prescription removed.');
-      });
-      actionsTd.appendChild(removeBtn);
+      
     }
 
     tr.appendChild(actionsTd);
