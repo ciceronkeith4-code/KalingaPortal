@@ -689,6 +689,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const schForm = document.getElementById('schedule-form');
   if (schForm) {
+        // Returns today's date as YYYY-MM-DD (local time, not UTC)
+    function getToday() {
+      const now = new Date();
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const day = String(now.getDate()).padStart(2, '0');
+      return `${now.getFullYear()}-${month}-${day}`;
+    }
+
+    // Grey out past dates in the date picker
+    document.getElementById('sch-date').min = getToday();
     schForm.addEventListener('submit', (e) => {
       e.preventDefault();
       let patientId = document.getElementById('sch-patient').value;
