@@ -155,24 +155,7 @@ function renderPatientsTable(searchQuery = '') {
     });
     actionsTd.appendChild(toggleBtn);
 
-    const deleteBtn = makeIconRowBtn({ action: 'delete', label: 'Delete patient', extraClass: 'danger' });
-    deleteBtn.addEventListener('click', async (e) => {
-      e.stopPropagation();
-      const ok = await confirmDialog({
-        title: 'Delete this patient?',
-        message: `This will permanently remove ${patient.name || patient.username} and all of their records. This cannot be undone.`,
-        confirmLabel: 'Yes, Delete',
-        cancelLabel: 'Cancel',
-        danger: true
-      });
-      if (!ok) return;
-      PatientStore.remove(patient.id);
-      const curSearch = document.getElementById('patients-table-search')?.value.trim() || '';
-      renderPatientsTable(curSearch);
-      renderDashboardStats();
-      showToast('Patient deleted.');
-    });
-    actionsTd.appendChild(deleteBtn);
+
 
     tr.appendChild(actionsTd);
     tbody.appendChild(tr);

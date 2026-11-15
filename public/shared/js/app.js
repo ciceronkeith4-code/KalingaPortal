@@ -692,28 +692,7 @@ function showPrescriptionDetailsModal(rx, role, onUpdate) {
       actions.appendChild(fulfillBtn);
     }
 
-    const deleteBtn = document.createElement('button');
-    deleteBtn.type = 'button';
-    deleteBtn.className = 'ghost-btn';
-    deleteBtn.style.color = 'var(--red-primary)';
-    deleteBtn.textContent = 'Remove';
-    deleteBtn.addEventListener('click', async () => {
-      const ok = await confirmDialog({
-        title: 'Remove Prescription?',
-        message: `Are you sure you want to remove this prescription for ${rx.patientName || 'patient'}? This cannot be undone.`,
-        confirmLabel: 'Yes, Remove',
-        danger: true
-      });
-      if (ok) {
-        if (typeof PatientStore !== 'undefined' && PatientStore.deletePrescription) {
-          PatientStore.deletePrescription(rx.patientId, rx.id);
-          if (typeof showToast === 'function') showToast('Prescription removed.');
-          if (typeof onUpdate === 'function') onUpdate();
-          close();
-        }
-      }
-    });
-    actions.appendChild(deleteBtn);
+    
   }
 
   const closeFootBtn = document.createElement('button');
