@@ -729,6 +729,10 @@ document.addEventListener('DOMContentLoaded', () => {
       const time = document.getElementById('sch-time').value;
       const reason = document.getElementById('sch-reason').value.trim();
       if (!date || !time) return;
+            if (date < getToday()) {
+        showToast('Events cannot be set in the past. Please choose today or a future date.');
+        return;
+      }
 
       PatientStore.addAppointment(patientId, date, time, reason);
       schForm.reset();
