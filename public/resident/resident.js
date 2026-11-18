@@ -149,26 +149,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
-
-  const rxForm = document.getElementById('rx-request-form');
-  if (rxForm) {
-    rxForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const patient = getMyPatient();
-      if (!patient) return;
-      const medicine = document.getElementById('rx-request-medicine').value.trim();
-      const notes = document.getElementById('rx-request-notes').value.trim();
-      if (!medicine) return;
-
-      PatientStore.requestPrescription(patient.id, medicine, notes);
-      rxForm.reset();
-      renderPrescriptions();
-      renderDashboardStats();
-      showToast('Prescription requested.');
-    });
-  }
- 
-
+  
   document.addEventListener('kalinga:viewchange', (e) => {
     if (e.detail.view === 'dashboard') renderDashboardStats();
     if (e.detail.view === 'prescriptions') renderPrescriptions();
