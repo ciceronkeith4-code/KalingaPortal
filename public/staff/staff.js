@@ -88,16 +88,9 @@ function renderPatientsTable(searchQuery = '') {
     const nameTd = document.createElement('td');
     nameTd.className = 'col-name' + (!patient.name ? ' table-empty-val' : '');
     nameTd.dataset.label = 'Name';
-    nameTd.textContent = patient.name || '-';
-    nameTd.title = patient.name || '-';
+    nameTd.textContent = patient.name || patient.username || '-';
+    nameTd.title = patient.name || patient.username || '-';
     tr.appendChild(nameTd);
-
-    const usernameTd = document.createElement('td');
-    usernameTd.className = 'col-username';
-    usernameTd.dataset.label = 'Username';
-    usernameTd.textContent = patient.username;
-    usernameTd.title = patient.username;
-    tr.appendChild(usernameTd);
 
     const statusTd = document.createElement('td');
     statusTd.className = 'col-status';

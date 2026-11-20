@@ -1,0 +1,315 @@
+/* ==========================================================================
+   Kalinga Portal - Anime.js Intro Overlay
+   Clean, color-connected (Navy #1B2A80 / #0A1138 & Red #E01E1E) splash & reveal
+   ========================================================================== */
+
+#intro-overlay[hidden] {
+  display: none !important;
+}
+
+.intro-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  pointer-events: auto;
+  user-select: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html.has-anime-intro .intro-overlay:not([hidden]) {
+    display: flex;
+  }
+}
+
+/* Soft tinted white/navy-subtle stage matching the login canvas */
+.intro-backdrop-base {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at 50% 45%,
+    var(--navy-subtle, #EEF2FF) 0%,
+    #F8FAFF 40%,
+    #FFFFFF 78%
+  );
+  will-change: transform, opacity;
+}
+
+/* Color-connected reveal ribbons (Red leading edge + Deep Navy veil) */
+.intro-sweep-navy {
+  position: absolute;
+  left: -4%;
+  right: -4%;
+  top: 0;
+  height: 112%;
+  background: linear-gradient(
+    145deg,
+    var(--navy-light, #2A3FA8) 0%,
+    var(--navy-primary, #1B2A80) 48%,
+    var(--navy-darkest, #0A1138) 100%
+  );
+  border-radius: 44px 44px 0 0;
+  box-shadow: 0 -16px 40px rgba(10, 17, 56, 0.22);
+  transform: translate3d(0, 108%, 0);
+  will-change: transform;
+  pointer-events: none;
+}
+
+.intro-sweep-red {
+  position: absolute;
+  left: -4%;
+  right: -4%;
+  top: 0;
+  height: 112%;
+  background: linear-gradient(
+    90deg,
+    var(--red-primary, #E01E1E) 0%,
+    var(--red-dark, #B30000) 100%
+  );
+  border-radius: 44px 44px 0 0;
+  transform: translate3d(0, 108%, 0);
+  will-change: transform;
+  pointer-events: none;
+}
+
+/* Centerpiece Lockup */
+.intro-stage {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 24px;
+  will-change: transform, opacity;
+}
+
+.intro-emblem {
+  position: relative;
+  width: 108px;
+  height: 108px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 22px;
+}
+
+.intro-emblem-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.intro-ring-track {
+  fill: none;
+  stroke: rgba(27, 42, 128, 0.12);
+  stroke-width: 2.5;
+}
+
+.intro-ring-navy {
+  fill: none;
+  stroke: var(--navy-primary, #1B2A80);
+  stroke-width: 3;
+  stroke-linecap: round;
+  transform: rotate(-90deg);
+  transform-origin: 54px 54px;
+}
+
+.intro-logo-wrap {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background-color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 28px rgba(15, 26, 77, 0.14);
+  border: 2px solid rgba(27, 42, 128, 0.12);
+  opacity: 0;
+  transform: scale(0.82);
+  will-change: transform, opacity;
+}
+
+.intro-logo-img {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Pulse line badge connecting Navy ring & Red heartbeat */
+.intro-pulse-badge {
+  position: absolute;
+  bottom: -6px;
+  right: -6px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background-color: #FFFFFF;
+  box-shadow: 0 4px 12px rgba(15, 26, 77, 0.16);
+  border: 1.5px solid rgba(224, 30, 30, 0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: scale(0.6);
+  will-change: transform, opacity;
+}
+
+.intro-pulse-svg {
+  width: 22px;
+  height: 22px;
+}
+
+.intro-pulse-red {
+  fill: none;
+  stroke: var(--red-primary, #E01E1E);
+  stroke-width: 2.25;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Typography */
+.intro-eyebrow {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--navy-primary, #1B2A80);
+  margin-bottom: 6px;
+  opacity: 0;
+  transform: translate3d(0, 12px, 0);
+  will-change: transform, opacity;
+}
+
+.intro-wordmark {
+  font-size: 2.15rem;
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: var(--text-headline, #0F1A4D);
+  margin-bottom: 6px;
+  opacity: 0;
+  transform: translate3d(0, 14px, 0);
+  will-change: transform, opacity;
+}
+
+.intro-wordmark-accent {
+  color: var(--red-primary, #E01E1E);
+}
+
+.intro-subtitle {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--text-body, #5B6275);
+  margin-bottom: 20px;
+  opacity: 0;
+  transform: translate3d(0, 12px, 0);
+  will-change: transform, opacity;
+}
+
+/* Sleek dual-color progress bar */
+.intro-progress-track {
+  position: relative;
+  width: 144px;
+  height: 4px;
+  border-radius: 9999px;
+  background-color: rgba(27, 42, 128, 0.12);
+  overflow: hidden;
+  opacity: 0;
+  will-change: opacity;
+}
+
+.intro-progress-navy {
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, var(--navy-dark, #101B5C) 0%, var(--navy-primary, #1B2A80) 55%, var(--navy-light, #2A3FA8) 100%);
+  transform-origin: left center;
+  transform: scaleX(0);
+  will-change: transform;
+}
+
+/* Skip Intro Control (Accessible, clean, subtle) */
+.intro-skip-btn {
+  position: absolute;
+  right: 28px;
+  bottom: 24px;
+  z-index: 10;
+  min-height: 36px;
+  padding: 6px 16px;
+  border-radius: 9999px;
+  border: 1.5px solid rgba(27, 42, 128, 0.22);
+  background-color: rgba(255, 255, 255, 0.92);
+  color: var(--text-headline, #0F1A4D);
+  font-family: inherit;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  opacity: 0;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.intro-skip-btn:hover {
+  background-color: var(--navy-subtle, #EEF2FF);
+  border-color: var(--navy-primary, #1B2A80);
+  color: var(--navy-primary, #1B2A80);
+}
+
+.intro-skip-btn:focus-visible {
+  outline: 3px solid var(--navy-primary, #1B2A80);
+  outline-offset: 2px;
+}
+
+/* Coordinate login stage entrance with Anime.js when intro is active */
+@media (prefers-reduced-motion: no-preference) {
+  html.has-anime-intro .top-nav,
+  html.has-anime-intro .hero-headline,
+  html.has-anime-intro .hero-description,
+  html.has-anime-intro .input-field-group,
+  html.has-anime-intro .form-aux-row,
+  html.has-anime-intro .sign-in-btn {
+    animation: none;
+    opacity: 0;
+    transform: translate3d(0, 18px, 0);
+  }
+
+  html.has-anime-intro .top-nav {
+    transform: translate3d(0, -14px, 0);
+  }
+}
+
+/* Keep CSS entrance keyframes disabled once Anime.js has animated the login stage */
+html.intro-completed .top-nav,
+html.intro-completed .hero-headline,
+html.intro-completed .hero-description,
+html.intro-completed .input-field-group,
+html.intro-completed .form-aux-row,
+html.intro-completed .sign-in-btn {
+  animation: none;
+}
+
+@media (max-width: 480px) {
+  .intro-wordmark {
+    font-size: 1.75rem;
+  }
+
+  .intro-skip-btn {
+    right: 16px;
+    bottom: 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #intro-overlay {
+    display: none !important;
+  }
+}

@@ -39,11 +39,25 @@ if (!session || !session.role) {
 // existing CSS `::before` background keyed off data-action/.danger (see
 // dashboard.css), so this just wires up the button shell, a hover tooltip,
 // and an accessible name for screen readers - no visible text label.
+const SHORT_ACTION_LABELS = {
+  details: 'View',
+  edit: 'Edit',
+  archive: 'Archive',
+  unarchive: 'Restore',
+  fulfill: 'Fulfill',
+  cancel: 'Cancel',
+  print: 'Print',
+  confirm: 'Confirm',
+  revert: 'Revert',
+  delete: 'Delete'
+};
+
 function makeIconRowBtn({ action, label, extraClass }) {
   const btn = document.createElement('button');
   btn.type = 'button';
   btn.className = 'row-btn' + (extraClass ? ' ' + extraClass : '');
   btn.dataset.action = action;
+  btn.dataset.shortLabel = SHORT_ACTION_LABELS[action] || label;
   btn.title = label;
   btn.setAttribute('aria-label', label);
   return btn;
@@ -271,15 +285,15 @@ function showPatientDetailsModal(patient) {
   header.appendChild(closeBtn);
   modal.appendChild(header);
 
-  // Details Grid
+  // Details & Credentials Grid
   const grid = document.createElement('div');
   grid.className = 'patient-details-grid';
 
   const fields = [
+    { label: 'Username', value: patient.username || '-' },
     { label: 'Age', value: patient.age ? `${patient.age} years old` : 'Not specified' },
     { label: 'Barangay Address', value: patient.address || 'Not specified' },
-    { label: 'System ID', value: patient.id || '-' },
-    { label: 'Role & Registry', value: 'Barangay 603 Resident' }
+    { label: 'System ID', value: patient.id || '-' }
   ];
 
   fields.forEach(f => {
@@ -295,6 +309,42 @@ function showPatientDetailsModal(patient) {
     box.appendChild(val);
     grid.appendChild(box);
   });
+
+  if (session && session.role === 'admin') {
+    const pwdBox = document.createElement('div');
+    pwdBox.className = 'patient-detail-box patient-detail-box--full';
+    const pwdLbl = document.createElement('div');
+    pwdLbl.className = 'patient-detail-label';
+    pwdLbl.textContent = 'Account Password';
+
+    const pwdRow = document.createElement('div');
+    pwdRow.className = 'patient-detail-secret-row';
+
+    const pwdVal = document.createElement('div');
+    pwdVal.className = 'patient-detail-val';
+    const realPwd = patient.password || 'Not set';
+    let revealed = false;
+    pwdVal.textContent = patient.password ? '••••••••' : 'Not set';
+
+    pwdRow.appendChild(pwdVal);
+
+    if (patient.password) {
+      const revealBtn = document.createElement('button');
+      revealBtn.type = 'button';
+      revealBtn.className = 'patient-secret-toggle-btn';
+      revealBtn.textContent = 'Show';
+      revealBtn.addEventListener('click', () => {
+        revealed = !revealed;
+        pwdVal.textContent = revealed ? realPwd : '••••••••';
+        revealBtn.textContent = revealed ? 'Hide' : 'Show';
+      });
+      pwdRow.appendChild(revealBtn);
+    }
+
+    pwdBox.appendChild(pwdLbl);
+    pwdBox.appendChild(pwdRow);
+    grid.appendChild(pwdBox);
+  }
   modal.appendChild(grid);
 
   // Prescriptions Section

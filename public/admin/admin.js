@@ -83,29 +83,9 @@ function renderPatientsTable(searchQuery = '') {
 
     const nameTd = document.createElement('td');
     nameTd.className = 'col-name' + (!patient.name ? ' table-empty-val' : '');
-    nameTd.textContent = patient.name || '-';
-    nameTd.title = patient.name || '-';
+    nameTd.textContent = patient.name || patient.username || '-';
+    nameTd.title = patient.name || patient.username || '-';
     tr.appendChild(nameTd);
-
-    const ageTd = document.createElement('td');
-    const hasAge = patient.age !== undefined && patient.age !== null && String(patient.age).trim() !== '';
-    ageTd.className = 'col-age' + (!hasAge ? ' table-empty-val' : '');
-    ageTd.textContent = hasAge ? patient.age : '-';
-    ageTd.title = hasAge ? String(patient.age) : '-';
-    tr.appendChild(ageTd);
-
-    const addressTd = document.createElement('td');
-    const hasAddress = patient.address && String(patient.address).trim() !== '';
-    addressTd.className = 'col-address' + (!hasAddress ? ' table-empty-val' : '');
-    addressTd.textContent = hasAddress ? patient.address : '-';
-    addressTd.title = hasAddress ? patient.address : '-';
-    tr.appendChild(addressTd);
-
-    const usernameTd = document.createElement('td');
-    usernameTd.className = 'col-username';
-    usernameTd.textContent = patient.username;
-    usernameTd.title = patient.username;
-    tr.appendChild(usernameTd);
 
     const statusTd = document.createElement('td');
     statusTd.className = 'col-status';

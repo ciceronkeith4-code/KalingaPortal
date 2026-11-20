@@ -520,9 +520,20 @@ body {
   }
 
   .form-aux-row {
-    flex-direction: column;
-    align-items: flex-start;
+    flex-direction: row-reverse;
+    align-items: center;
+    justify-content: space-between;
     gap: 12px;
+  }
+
+  .show-password-field,
+  .forgot-password-link {
+    font-size: 0.875rem;
+    white-space: nowrap;
+  }
+
+  .show-password-field {
+    gap: 8px;
   }
 }
 

@@ -305,7 +305,7 @@
               <circle cx="11" cy="11" r="8"></circle>
               <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
             </svg>
-            <input type="text" id="patients-table-search" class="table-search-input" placeholder="Search patients by name, age, address, or username..." aria-label="Search patients">
+            <input type="text" id="patients-table-search" class="table-search-input" placeholder="Search patients..." aria-label="Search patients">
             <button type="button" class="table-search-clear-btn" id="patients-table-search-clear" hidden title="Clear search">✕</button>
           </div>
           <span class="table-records-badge" id="patients-records-count"></span>
@@ -314,19 +314,13 @@
         <div class="table-container">
           <table class="data-table data-table--patients">
             <colgroup>
-              <col class="col-name" style="width: 20%;">
-              <col class="col-age" style="width: 8%;">
-              <col class="col-address" style="width: 22%;">
-              <col class="col-username" style="width: 17%;">
-              <col class="col-status" style="width: 13%;">
-              <col class="col-actions" style="width: 20%;">
+              <col class="col-name" style="width: 54%;">
+              <col class="col-status" style="width: 22%;">
+              <col class="col-actions" style="width: 24%;">
             </colgroup>
             <thead>
               <tr>
                 <th class="col-name">Name</th>
-                <th class="col-age">Age</th>
-                <th class="col-address">Address</th>
-                <th class="col-username">Username</th>
                 <th class="col-status">Status</th>
                 <th class="col-actions">Actions</th>
               </tr>
