@@ -16,7 +16,9 @@ function renderDashboardStats() {
   const apptEl = document.getElementById('stat-total-appointments');
 
   if (activeEl) activeEl.textContent = patients.filter((p) => !p.archived).length;
-  if (pendingRxEl) pendingRxEl.textContent = allRx.filter((rx) => rx.status === 'requested').length;
+    const now = new Date();
+  const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  if (pendingRxEl) pendingRxEl.textContent = allRx.filter((rx) => rx.dateGiven === todayStr).length;
   if (archivedEl) archivedEl.textContent = patients.filter((p) => p.archived).length;
   if (apptEl) apptEl.textContent = allSchedule.length;
 }
