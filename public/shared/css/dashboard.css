@@ -1436,10 +1436,24 @@ body {
   text-align: center;
 }
 
-/* Staff Prescriptions: Patient: 22% (Left), Medicine: 22% (Left), Notes: 24% (Left), Status: 14% (Center), Actions: 18% (Center) */
+/* Staff Prescriptions: Patient 24% (Left), Date given 16% (Center), Doctor 22% (Left), Medicines 38% (Left) */
 .data-table--prescriptions col.col-patient,
 .data-table--prescriptions th.col-patient,
 .data-table--prescriptions td.col-patient {
+  width: 24%;
+  text-align: left;
+}
+
+.data-table--prescriptions col.col-date,
+.data-table--prescriptions th.col-date,
+.data-table--prescriptions td.col-date {
+  width: 16%;
+  text-align: center;
+}
+
+.data-table--prescriptions col.col-doctor,
+.data-table--prescriptions th.col-doctor,
+.data-table--prescriptions td.col-doctor {
   width: 22%;
   text-align: left;
 }
@@ -1447,29 +1461,8 @@ body {
 .data-table--prescriptions col.col-medicine,
 .data-table--prescriptions th.col-medicine,
 .data-table--prescriptions td.col-medicine {
-  width: 22%;
+  width: 38%;
   text-align: left;
-}
-
-.data-table--prescriptions col.col-notes,
-.data-table--prescriptions th.col-notes,
-.data-table--prescriptions td.col-notes {
-  width: 24%;
-  text-align: left;
-}
-
-.data-table--prescriptions col.col-status,
-.data-table--prescriptions th.col-status,
-.data-table--prescriptions td.col-status {
-  width: 14%;
-  text-align: center;
-}
-
-.data-table--prescriptions col.col-actions,
-.data-table--prescriptions th.col-actions,
-.data-table--prescriptions td.col-actions {
-  width: 18%;
-  text-align: center;
 }
 
 /* Staff Schedule: Patient: 20% (Left), Date: 14% (Center), Time: 12% (Center), Reason: 24% (Left), Status: 14% (Center), Actions: 16% (Center) */
@@ -4128,4 +4121,18 @@ body {
 
 .rx-photo-dialog .rx-btn {
   width: 100%;
+}
+
+/* ===== Scrollable table (staff prescriptions) ===== */
+.table-container--scroll {
+  max-height: 520px;   /* about 10 rows tall */
+  overflow-y: auto;    /* scroll inside the box for more */
+}
+
+/* Keep the column titles visible while scrolling */
+.table-container--scroll thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--color-surface);
 }
