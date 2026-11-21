@@ -3973,3 +3973,98 @@ body {
     font-size: 0.65rem;
   }
 }
+
+
+/* ===== Resident prescription cards ===== */
+.rx-card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.rx-card {
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-border);
+  border-radius: 14px;
+  padding: 18px 20px;
+}
+
+.rx-card-header {
+  border-bottom: 1.5px solid var(--color-border-subtle);
+  padding-bottom: 12px;
+  margin-bottom: 4px;
+}
+
+.rx-card-date {
+  margin: 0;
+  font-size: 1.15rem;
+  color: var(--navy-primary);
+}
+
+.rx-card-meta {
+  margin: 4px 0 0;
+  font-size: 1rem;
+  color: var(--color-text-secondary);
+}
+
+.rx-med-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  counter-reset: med;
+}
+
+.rx-med {
+  counter-increment: med;
+  padding: 14px 0;
+  border-bottom: 1.5px solid var(--color-border-subtle);
+}
+
+.rx-med:last-child {
+  border-bottom: none;
+}
+
+.rx-med-name {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+/* Shows "1." "2." before each medicine name */
+.rx-med-name::before {
+  content: counter(med) ". ";
+}
+
+.rx-med-numbers {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.rx-num {
+  display: flex;
+  flex-direction: column;
+  background: var(--navy-subtle);
+  border-radius: 10px;
+  padding: 8px 10px;
+}
+
+.rx-num-label {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+}
+
+.rx-num-value {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--navy-dark);
+}
+
+.rx-med-note {
+  margin: 8px 0 0;
+  font-size: 0.95rem;
+  color: var(--color-text-secondary);
+}
