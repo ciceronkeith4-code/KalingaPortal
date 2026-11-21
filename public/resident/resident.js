@@ -47,6 +47,28 @@ function makeNumBox(label, value) {
   return box;
 }
 
+// Opens the prescription photo in a pop-up window inside the page
+function openRxPhoto(rx) {
+  const title = `Prescription photo, ${formatRxDate(rx.dateGiven)}`;
+  const dialog = makeEl('dialog', 'rx-photo-dialog');
+  dialog.setAttribute('aria-label', title);
+  dialog.appendChild(makeEl('h3', 'rx-photo-title', title));
+
+  const img = makeEl('img', 'rx-photo-img');
+  img.src = rx.photo;
+  img.alt = `Photo of the signed prescription from ${rx.doctorName}`;
+  dialog.appendChild(img);
+
+  const closeBtn = makeEl('button', 'rx-btn', 'Close');
+  closeBtn.type = 'button';
+  closeBtn.addEventListener('click', () => dialog.close());
+  dialog.appendChild(closeBtn);
+
+  dialog.addEventListener('close', () => dialog.remove());
+  document.body.appendChild(dialog);
+  dialog.showModal();
+}
+
 function renderPrescriptions() {
   const list = document.getElementById('prescriptions-list');
   const emptyEl = document.getElementById('prescriptions-empty');
@@ -89,6 +111,15 @@ function renderPrescriptions() {
     });
     card.appendChild(medList);
 
+        // Only show photo buttons if this prescription has a photo
+    if (rx.photo) {
+      const actions = makeEl('div', 'rx-card-actions');
+      const viewBtn = makeEl('button', 'rx-btn', 'View photo');
+      viewBtn.type = 'button';
+      viewBtn.addEventListener('click', () => openRxPhoto(rx));
+      actions.appendChild(viewBtn);
+      card.appendChild(actions);
+    }
     list.appendChild(card);
   });
 }
