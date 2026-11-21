@@ -4068,3 +4068,64 @@ body {
   font-size: 0.95rem;
   color: var(--color-text-secondary);
 }
+
+/* ===== Prescription photo buttons ===== */
+.rx-card-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.rx-btn {
+  flex: 1;
+  min-height: 48px;          /* big tap target for seniors */
+  padding: 10px 16px;
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--navy-primary);
+  background: var(--color-surface);
+  border: 1.5px solid var(--navy-primary);
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.rx-btn:hover {
+  background: var(--navy-subtle);
+}
+
+.rx-btn:focus-visible {
+  outline: 3px solid var(--navy-light);
+  outline-offset: 2px;
+}
+
+/* ===== Photo pop-up ===== */
+.rx-photo-dialog {
+  width: min(92vw, 520px);
+  border: none;
+  border-radius: 14px;
+  padding: 18px 20px;
+}
+
+.rx-photo-dialog::backdrop {
+  background: rgba(10, 17, 56, 0.6);
+}
+
+.rx-photo-title {
+  margin: 0 0 12px;
+  font-size: 1.1rem;
+  color: var(--navy-primary);
+}
+
+.rx-photo-img {
+  display: block;
+  width: 100%;
+  max-height: 65vh;
+  object-fit: contain;
+  border-radius: 8px;
+  margin-bottom: 14px;
+}
+
+.rx-photo-dialog .rx-btn {
+  width: 100%;
+}
