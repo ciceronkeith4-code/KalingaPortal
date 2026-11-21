@@ -4136,3 +4136,53 @@ body {
   z-index: 1;
   background: var(--color-surface);
 }
+
+/* ===== Staff form: medicine rows ===== */
+.rx-meds-fieldset {
+  border: 1.5px solid var(--color-border);
+  border-radius: 14px;
+  padding: 16px;
+  margin: 16px 0;
+}
+
+.rx-meds-fieldset legend {
+  padding: 0 8px;
+  font-weight: 600;
+  color: var(--navy-primary);
+}
+
+/* Phone: 2 fields per line */
+.rx-med-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  padding: 14px 0;
+  border-bottom: 1.5px dashed var(--color-border);
+}
+
+/* Medicine name, note and remove button use the full width */
+.rx-med-row .rx-med-name-field,
+.rx-med-row .rx-med-note-field,
+.rx-med-row .rx-remove-med-btn {
+  grid-column: 1 / -1;
+}
+
+/* Computer: name, dose, unit, times a day, days on one line */
+@media (min-width: 900px) {
+  .rx-med-row {
+    grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+  }
+  .rx-med-row .rx-med-name-field {
+    grid-column: auto;
+  }
+}
+
+.rx-remove-med-btn {
+  justify-self: start;
+  color: var(--red-dark);
+  border-color: var(--red-dark);
+}
+
+.rx-add-med-btn {
+  margin-top: 12px;
+}
