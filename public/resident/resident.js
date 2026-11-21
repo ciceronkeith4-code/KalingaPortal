@@ -69,6 +69,56 @@ function openRxPhoto(rx) {
   dialog.showModal();
 }
 
+// Opens a clean print page with the prescription photo, then prints it
+function printRxPhoto(rx) {
+  const win = window.open('', '_blank');
+  if (!win) {
+    showToast('Please allow pop-ups so the prescription can be printed.');
+    return;
+  }
+  const doc = win.document;
+  const patient = getMyPatient();
+  const patientName = patient ? (patient.name || patient.username) : '';
+  doc.title = `Prescription - ${formatRxDate(rx.dateGiven)}`;
+
+  const style = doc.createElement('style');
+  style.textContent = `
+    @page { margin: 15mm; }
+    body { font-family: Arial, sans-serif; color: #000; margin: 0; }
+    .head { display: flex; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 8px; margin-bottom: 16px; }
+    .head p { margin: 2px 0; }
+    img { display: block; max-width: 100%; max-height: 210mm; margin: 0 auto; }
+    .foot { display: flex; justify-content: space-between; border-top: 1px solid #999; margin-top: 16px; padding-top: 6px; font-size: 11px; color: #444; }
+  `;
+  doc.head.appendChild(style);
+
+  const head = makeEl('div', 'head');
+  const left = makeEl('div');
+  left.appendChild(makeEl('p', '', 'Barangay 386 Health Center'));
+  left.appendChild(makeEl('p', '', 'Quiapo, Manila'));
+  const right = makeEl('div');
+  right.appendChild(makeEl('p', '', `Patient: ${patientName}`));
+  right.appendChild(makeEl('p', '', `Date given: ${formatRxDate(rx.dateGiven)}`));
+  head.append(left, right);
+
+  const img = makeEl('img');
+  img.alt = `Signed prescription from ${rx.doctorName}`;
+
+  const foot = makeEl('div', 'foot');
+  foot.appendChild(makeEl('span', '', `Printed from Alaga Portal on ${new Date().toLocaleDateString('en-PH', { month: 'short', day: 'numeric', year: 'numeric' })}`));
+  foot.appendChild(makeEl('span', '', `Ref no. ${rx.id}`));
+
+  doc.body.append(head, img, foot);
+
+  // Print only after the photo has finished loading, then close the tab
+  img.addEventListener('load', () => {
+    win.focus();
+    win.print();
+  });
+  win.addEventListener('afterprint', () => win.close());
+  img.src = new URL(rx.photo, window.location.href).href;
+}
+
 function renderPrescriptions() {
   const list = document.getElementById('prescriptions-list');
   const emptyEl = document.getElementById('prescriptions-empty');
@@ -118,6 +168,10 @@ function renderPrescriptions() {
       viewBtn.type = 'button';
       viewBtn.addEventListener('click', () => openRxPhoto(rx));
       actions.appendChild(viewBtn);
+            const printBtn = makeEl('button', 'rx-btn', 'Print photo');
+      printBtn.type = 'button';
+      printBtn.addEventListener('click', () => printRxPhoto(rx));
+      actions.appendChild(printBtn);
       card.appendChild(actions);
     }
     list.appendChild(card);
