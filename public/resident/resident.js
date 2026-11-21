@@ -18,14 +18,46 @@ function renderDashboardStats() {
   if (apptEl) apptEl.textContent = patient ? patient.schedule.length : 0;
 }
 
+// Small helper: create an element with a class and (safe) text
+function makeEl(tag, className, text) {
+  const el = document.createElement(tag);
+  if (className) el.className = className;
+  if (text !== undefined) el.textContent = text;
+  return el;
+}
+
+// "2026-11-20" -> "Nov 20, 2026"
+function formatRxDate(isoDate) {
+  const [y, m, d] = isoDate.split('-').map(Number);
+  return new Date(y, m - 1, d).toLocaleDateString('en-PH', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+// Find the event's name from its id (empty if walk-in or not found)
+function getEventName(eventId) {
+  if (!eventId) return '';
+  const event = PatientStore.getAllSchedule().find((s) => s.id === eventId);
+  return event ? (event.reason || 'Health event') : '';
+}
+
+// One number box, e.g. label "Dose", value "500 mg"
+function makeNumBox(label, value) {
+  const box = makeEl('div', 'rx-num');
+  box.appendChild(makeEl('span', 'rx-num-label', label));
+  box.appendChild(makeEl('span', 'rx-num-value', value));
+  return box;
+}
+
 function renderPrescriptions() {
-  const tbody = document.getElementById('prescriptions-table-body');
+  const list = document.getElementById('prescriptions-list');
   const emptyEl = document.getElementById('prescriptions-empty');
-  if (!tbody) return;
+  if (!list) return;
 
   const patient = getMyPatient();
-  const entries = patient ? patient.prescriptions : [];
-  tbody.innerHTML = '';
+  // Only new-format prescriptions (with a medicines list), newest first
+  const entries = (patient ? patient.prescriptions : [])
+    .filter((rx) => Array.isArray(rx.medicines))
+    .sort((a, b) => b.dateGiven.localeCompare(a.dateGiven));
+  list.innerHTML = '';
 
   if (entries.length === 0) {
     if (emptyEl) emptyEl.hidden = false;
@@ -34,29 +66,30 @@ function renderPrescriptions() {
   if (emptyEl) emptyEl.hidden = true;
 
   entries.forEach((rx) => {
-    const tr = document.createElement('tr');
+    const card = makeEl('article', 'rx-card');
 
-    const medTd = document.createElement('td');
-    medTd.className = 'col-medicine';
-    medTd.dataset.label = 'Medicine';
-    medTd.textContent = rx.medicine;
-    medTd.title = rx.medicine;
-    tr.appendChild(medTd);
+    const header = makeEl('div', 'rx-card-header');
+    header.appendChild(makeEl('h3', 'rx-card-date', formatRxDate(rx.dateGiven)));
+    header.appendChild(makeEl('p', 'rx-card-meta', `Prescribed by ${rx.doctorName}`));
+    const eventName = getEventName(rx.eventId);
+    if (eventName) header.appendChild(makeEl('p', 'rx-card-meta', `From event: ${eventName}`));
+    card.appendChild(header);
 
-    const notesTd = document.createElement('td');
-    notesTd.className = 'col-notes' + (!rx.notes ? ' table-empty-val' : '');
-    notesTd.dataset.label = 'Notes';
-    notesTd.textContent = rx.notes || '-';
-    notesTd.title = rx.notes || '-';
-    tr.appendChild(notesTd);
+    const medList = makeEl('ol', 'rx-med-list');
+    rx.medicines.forEach((med) => {
+      const item = makeEl('li', 'rx-med');
+      item.appendChild(makeEl('p', 'rx-med-name', med.name));
+      const nums = makeEl('div', 'rx-med-numbers');
+      nums.appendChild(makeNumBox('Dose', `${med.dose} ${med.unit}`));
+      nums.appendChild(makeNumBox('Times a day', `${med.timesPerDay}x`));
+      nums.appendChild(makeNumBox('For how long', `${med.days} days`));
+      item.appendChild(nums);
+      if (med.note) item.appendChild(makeEl('p', 'rx-med-note', med.note));
+      medList.appendChild(item);
+    });
+    card.appendChild(medList);
 
-    const statusTd = document.createElement('td');
-    statusTd.className = 'col-status';
-    statusTd.dataset.label = 'Status';
-    statusTd.appendChild(rx.status === 'fulfilled' ? statusPill('Fulfilled', 'fulfilled') : statusPill('Requested', 'requested'));
-    tr.appendChild(statusTd);
-
-    tbody.appendChild(tr);
+    list.appendChild(card);
   });
 }
 
