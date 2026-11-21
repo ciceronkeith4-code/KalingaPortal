@@ -284,25 +284,36 @@ function renderPrescriptionsTable(searchQuery = '') {
   const countBadge = document.getElementById('rx-records-count');
   if (!tbody) return;
 
-  let entries = PatientStore.getAllPrescriptions();
+  // Adds one table cell with safe text
+  function addCell(tr, className, label, text) {
+    const td = document.createElement('td');
+    td.className = className;
+    td.dataset.label = label;
+    td.textContent = text;
+    td.title = text;
+    tr.appendChild(td);
+  }
+
+  // New-format prescriptions only (with a medicines list), newest first
+  let entries = PatientStore.getAllPrescriptions()
+    .filter((rx) => Array.isArray(rx.medicines))
+    .sort((a, b) => b.dateGiven.localeCompare(a.dateGiven));
   const totalCount = entries.length;
 
   if (searchQuery) {
     const q = searchQuery.toLowerCase();
     entries = entries.filter((rx) =>
       (rx.patientName && rx.patientName.toLowerCase().includes(q)) ||
-      (rx.medicine && rx.medicine.toLowerCase().includes(q)) ||
-      (rx.notes && rx.notes.toLowerCase().includes(q)) ||
-      (rx.status && rx.status.toLowerCase().includes(q))
+      (rx.doctorName && rx.doctorName.toLowerCase().includes(q)) ||
+      rx.dateGiven.includes(q) ||
+      rx.medicines.some((m) => m.name.toLowerCase().includes(q))
     );
   }
 
   if (countBadge) {
-    if (searchQuery) {
-      countBadge.textContent = `${entries.length} of ${totalCount} records`;
-    } else {
-      countBadge.textContent = `${totalCount} records total`;
-    }
+    countBadge.textContent = searchQuery
+      ? `${entries.length} of ${totalCount} records`
+      : `${totalCount} records total`;
   }
 
   tbody.innerHTML = '';
@@ -312,11 +323,9 @@ function renderPrescriptionsTable(searchQuery = '') {
       emptyEl.hidden = false;
       emptyEl.style.display = 'flex';
       const msgNode = emptyEl.querySelector('.empty-state-msg') || emptyEl.lastChild;
-      if (searchQuery) {
-        msgNode.textContent = `No prescriptions found matching "${searchQuery}".`;
-      } else {
-        msgNode.textContent = 'No prescriptions yet.';
-      }
+      msgNode.textContent = searchQuery
+        ? `No prescriptions found matching "${searchQuery}".`
+        : 'No prescriptions yet.';
     }
     return;
   }
@@ -327,117 +336,10 @@ function renderPrescriptionsTable(searchQuery = '') {
 
   entries.forEach((rx) => {
     const tr = document.createElement('tr');
-    tr.className = 'patient-row-clickable';
-    tr.title = 'Click to view prescription details';
-    tr.addEventListener('click', (e) => {
-      if (e.target.closest('button')) return;
-      showPrescriptionDetailsModal(rx, 'staff', () => {
-        renderPrescriptionsTable(document.getElementById('rx-table-search')?.value.trim() || '');
-        renderDashboardStats();
-      });
-    });
-
-    const patientTd = document.createElement('td');
-    patientTd.className = 'col-patient';
-    patientTd.dataset.label = 'Patient';
-    patientTd.textContent = rx.patientName;
-    patientTd.title = rx.patientName;
-    tr.appendChild(patientTd);
-
-    const medTd = document.createElement('td');
-    medTd.className = 'col-medicine';
-    medTd.dataset.label = 'Medicine';
-    medTd.textContent = rx.medicine;
-    medTd.title = rx.medicine;
-    tr.appendChild(medTd);
-
-    const notesTd = document.createElement('td');
-    notesTd.className = 'col-notes' + (!rx.notes ? ' table-empty-val' : '');
-    notesTd.dataset.label = 'Notes';
-    notesTd.textContent = rx.notes || '-';
-    notesTd.title = rx.notes || '-';
-    tr.appendChild(notesTd);
-
-    const statusTd = document.createElement('td');
-    statusTd.className = 'col-status';
-    statusTd.dataset.label = 'Status';
-    statusTd.appendChild(rx.status === 'fulfilled' ? statusPill('Fulfilled', 'fulfilled') : statusPill('Requested', 'requested'));
-    tr.appendChild(statusTd);
-
-    const actionsTd = document.createElement('td');
-    actionsTd.className = 'actions-cell col-actions';
-
-    if (rx.status === 'requested') {
-      // Fulfill button
-      const fulfillBtn = makeIconRowBtn({ action: 'fulfill', label: 'Fulfill prescription', extraClass: 'success' });
-      fulfillBtn.addEventListener('click', async (e) => {
-        e.stopPropagation();
-        const ok = await confirmDialog({
-          title: 'Fulfill Prescription?',
-          message: `Confirm that ${rx.medicine || 'this medicine'} has been dispensed to ${rx.patientName}.`,
-          confirmLabel: 'Yes, Fulfill'
-        });
-        if (!ok) return;
-        PatientStore.fulfillPrescription(rx.patientId, rx.id);
-        renderPrescriptionsTable(document.getElementById('rx-table-search')?.value.trim() || '');
-        renderDashboardStats();
-        showToast('Prescription fulfilled.');
-      });
-      actionsTd.appendChild(fulfillBtn);
-
-      // Details button
-      const detailsBtn = makeIconRowBtn({ action: 'details', label: 'View details' });
-      detailsBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        showPrescriptionDetailsModal(rx, 'staff', () => {
-          renderPrescriptionsTable(document.getElementById('rx-table-search')?.value.trim() || '');
-          renderDashboardStats();
-        });
-      });
-      actionsTd.appendChild(detailsBtn);
-
-      // Cancel button
-      const cancelBtn = makeIconRowBtn({ action: 'cancel', label: 'Cancel prescription', extraClass: 'danger' });
-      cancelBtn.addEventListener('click', async (e) => {
-        e.stopPropagation();
-        const ok = await confirmDialog({
-          title: 'Cancel Prescription?',
-          message: `Are you sure you want to cancel the prescription for ${rx.patientName}?`,
-          confirmLabel: 'Yes, Cancel',
-          danger: true
-        });
-        if (ok) {
-          PatientStore.deletePrescription(rx.patientId, rx.id);
-          renderPrescriptionsTable(document.getElementById('rx-table-search')?.value.trim() || '');
-          renderDashboardStats();
-          showToast('Prescription cancelled.');
-        }
-      });
-      actionsTd.appendChild(cancelBtn);
-    } else {
-      // Fulfilled status: Details button
-      const detailsBtn = makeIconRowBtn({ action: 'details', label: 'View details' });
-      detailsBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        showPrescriptionDetailsModal(rx, 'staff', () => {
-          renderPrescriptionsTable(document.getElementById('rx-table-search')?.value.trim() || '');
-          renderDashboardStats();
-        });
-      });
-      actionsTd.appendChild(detailsBtn);
-
-      // Print Slip button
-      const printBtn = makeIconRowBtn({ action: 'print', label: 'Print slip' });
-      printBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        printPrescriptionSlip(rx);
-      });
-      actionsTd.appendChild(printBtn);
-
-      
-    }
-
-    tr.appendChild(actionsTd);
+    addCell(tr, 'col-patient', 'Patient', rx.patientName);
+    addCell(tr, 'col-date', 'Date given', rx.dateGiven);
+    addCell(tr, 'col-doctor', 'Doctor', rx.doctorName);
+    addCell(tr, 'col-medicine', 'Medicines', rx.medicines.map((m) => m.name).join(', '));
     tbody.appendChild(tr);
   });
 }
