@@ -168,6 +168,27 @@ const PatientStore = {
     return { ok: true };
   },
 
+    // Staff: save a prescription in the new format (one checkup, many medicines).
+  // details = { dateGiven, doctorName, eventId, medicines: [{ name, dose, unit, timesPerDay, days, note }] }
+  createPrescription(patientId, details) {
+    const patients = loadPatients();
+    const patient = patients.find((p) => p.id === patientId);
+    if (!patient) return { ok: false, error: 'Patient not found.' };
+    if (!details.medicines || details.medicines.length === 0) {
+      return { ok: false, error: 'Add at least one medicine.' };
+    }
+    patient.prescriptions.push({
+      id: genId('rx'),
+      dateGiven: details.dateGiven,
+      doctorName: details.doctorName,
+      eventId: details.eventId || null,
+      photo: null,
+      medicines: details.medicines
+    });
+    savePatients(patients);
+    return { ok: true };
+  },
+
   fulfillPrescription(patientId, prescriptionId) {
     const patients = loadPatients();
     const patient = patients.find((p) => p.id === patientId);
