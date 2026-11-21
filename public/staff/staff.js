@@ -636,6 +636,71 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const rxForm = document.getElementById('prescription-form');
   if (rxForm) {
+        const MAX_MEDICINES = 5;
+    const medRows = document.getElementById('rx-med-rows');
+    const addMedBtn = document.getElementById('rx-add-med');
+    let medRowCount = 0;
+
+    // Today's date as YYYY-MM-DD (local time)
+    function rxToday() {
+      const now = new Date();
+      return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    }
+
+    // Adds one empty medicine row (max 5)
+    function addMedRow() {
+      if (medRows.children.length >= MAX_MEDICINES) return;
+      medRowCount += 1;
+      const n = medRowCount;
+      const row = document.createElement('div');
+      row.className = 'rx-med-row';
+      row.innerHTML = `
+        <div class="form-field rx-med-name-field"><label for="med-name-${n}">Medicine</label><input type="text" id="med-name-${n}" class="med-name" placeholder="e.g. Amoxicillin" required></div>
+        <div class="form-field"><label for="med-dose-${n}">Dose</label><input type="number" id="med-dose-${n}" class="med-dose" min="0" step="any" required></div>
+        <div class="form-field"><label for="med-unit-${n}">Unit</label><select id="med-unit-${n}" class="med-unit"><option>mg</option><option>ml</option><option>tablet</option></select></div>
+        <div class="form-field"><label for="med-times-${n}">Times a day</label><input type="number" id="med-times-${n}" class="med-times" min="1" max="24" required></div>
+        <div class="form-field"><label for="med-days-${n}">Days</label><input type="number" id="med-days-${n}" class="med-days" min="1" required></div>
+        <div class="form-field rx-med-note-field"><label for="med-note-${n}">Note (optional)</label><input type="text" id="med-note-${n}" class="med-note" placeholder="e.g. After meals"></div>
+        <button type="button" class="rx-btn rx-remove-med-btn">Remove this row</button>`;
+      row.querySelector('.rx-remove-med-btn').addEventListener('click', () => {
+        row.remove();
+        updateMedButtons();
+      });
+      medRows.appendChild(row);
+      updateMedButtons();
+    }
+
+    // Hide "Remove" when only 1 row is left, and hide "Add" at 5 rows
+    function updateMedButtons() {
+      const rows = medRows.querySelectorAll('.rx-med-row');
+      rows.forEach((r) => { r.querySelector('.rx-remove-med-btn').hidden = rows.length === 1; });
+      addMedBtn.hidden = rows.length >= MAX_MEDICINES;
+    }
+
+    // Back to one empty row (after saving)
+    function resetMedRows() {
+      medRows.innerHTML = '';
+      addMedRow();
+    }
+
+    // Fill the Event list with events staff created
+    function fillEventOptions() {
+      const select = document.getElementById('rx-event');
+      select.length = 1; // keep "None (walk-in)"
+      PatientStore.getAllSchedule().forEach((ev) => {
+        const opt = document.createElement('option');
+        opt.value = ev.id;
+        opt.textContent = `${ev.reason || 'Health event'} (${ev.date})`;
+        select.appendChild(opt);
+      });
+    }
+
+    addMedBtn.addEventListener('click', addMedRow);
+    const rxDateInput = document.getElementById('rx-date');
+    rxDateInput.value = rxToday();
+    rxDateInput.max = rxToday(); // a prescription can't be given in the future
+    fillEventOptions();
+    resetMedRows();
     rxForm.addEventListener('submit', (e) => {
       e.preventDefault();
       let patientId = document.getElementById('rx-patient').value;
@@ -662,12 +727,30 @@ document.addEventListener('DOMContentLoaded', () => {
         if (rxSearchInput) rxSearchInput.focus();
         return;
       }
-      const medicine = document.getElementById('rx-medicine').value.trim();
-      const notes = document.getElementById('rx-notes').value.trim();
-      if (!medicine) return;
+            // Collect every medicine row into a list
+      const medicines = [...medRows.querySelectorAll('.rx-med-row')].map((row) => ({
+        name: row.querySelector('.med-name').value.trim(),
+        dose: Number(row.querySelector('.med-dose').value),
+        unit: row.querySelector('.med-unit').value,
+        timesPerDay: Number(row.querySelector('.med-times').value),
+        days: Number(row.querySelector('.med-days').value),
+        note: row.querySelector('.med-note').value.trim()
+      }));
 
-      PatientStore.addPrescription(patientId, medicine, notes);
+      const result = PatientStore.createPrescription(patientId, {
+        dateGiven: rxDateInput.value,
+        doctorName: document.getElementById('rx-doctor').value.trim(),
+        eventId: document.getElementById('rx-event').value || null,
+        medicines
+      });
+      if (!result.ok) {
+        showToast(result.error);
+        return;
+      }
+
       rxForm.reset();
+      resetMedRows();
+      rxDateInput.value = rxToday();
       if (rxSearchInput) rxSearchInput.value = '';
       document.getElementById('rx-patient').value = '';
       const clearBtn = document.getElementById('rx-patient-search-clear');
