@@ -182,7 +182,7 @@ const PatientStore = {
       dateGiven: details.dateGiven,
       doctorName: details.doctorName,
       eventId: details.eventId || null,
-      photo: null,
+      photo: details.photo || null,
       medicines: details.medicines
     });
     savePatients(patients);
