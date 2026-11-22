@@ -679,51 +679,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Grey out past dates in the date picker
     document.getElementById('sch-date').min = getToday();
-    schForm.addEventListener('submit', (e) => {
+        schForm.addEventListener('submit', (e) => {
       e.preventDefault();
-      let patientId = document.getElementById('sch-patient').value;
-      const schSearchInput = document.getElementById('sch-patient-search');
-
-      // If hidden input is empty, attempt auto-matching from the search text
-      if (!patientId && schSearchInput && schSearchInput.value.trim()) {
-        const val = schSearchInput.value.trim().toLowerCase();
-        const active = PatientStore.getActive();
-        const match = active.find((p) => {
-          const fullLabel = p.name ? `${p.name} (@${p.username})` : `@${p.username}`;
-          return fullLabel.toLowerCase().includes(val) ||
-                 (p.name && p.name.toLowerCase().includes(val)) ||
-                 (p.username && p.username.toLowerCase().includes(val.replace(/^@/, '')));
-        });
-        if (match) {
-          patientId = match.id;
-          document.getElementById('sch-patient').value = match.id;
-        }
-      }
-
-      if (!patientId) {
-        showToast('Please search and select a valid active patient.');
-        if (schSearchInput) schSearchInput.focus();
-        return;
-      }
+      
       const date = document.getElementById('sch-date').value;
-      const time = document.getElementById('sch-time').value;
-      const reason = document.getElementById('sch-reason').value.trim();
-      if (!date || !time) return;
-            if (date < getToday()) {
+      if (date < getToday()) {
         showToast('Events cannot be set in the past. Please choose today or a future date.');
         return;
       }
 
-      PatientStore.addAppointment(patientId, date, time, reason);
-      schForm.reset();
-      if (schSearchInput) schSearchInput.value = '';
-      document.getElementById('sch-patient').value = '';
-      const clearBtn = document.getElementById('sch-patient-search-clear');
-      if (clearBtn) clearBtn.hidden = true;
+      const result = EventStore.create({
+        title: document.getElementById('ev-title').value.trim(),
+        date,
+        startTime: document.getElementById('ev-start').value,
+        endTime: document.getElementById('ev-end').value,
+        location: document.getElementById('ev-location').value.trim(),
+        audience: document.getElementById('ev-audience').value.trim(),
+        notes: document.getElementById('ev-notes').value.trim()
+      });
+      if (!result.ok) {
+        showToast(result.error);
+        return;
+      }
 
+      schForm.reset(); // Location goes back to its pre-filled value
       renderScheduleTable();
       renderDashboardStats();
-      showToast('Appointment set.');
+      showToast('Event posted.');
     });
   }
 
