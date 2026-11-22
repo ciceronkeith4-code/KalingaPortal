@@ -35,8 +35,8 @@ function formatRxDate(isoDate) {
 // Find the event's name from its id (empty if walk-in or not found)
 function getEventName(eventId) {
   if (!eventId) return '';
-  const event = PatientStore.getAllSchedule().find((s) => s.id === eventId);
-  return event ? (event.reason || 'Health event') : '';
+  const event = EventStore.getById(eventId);
+  return event ? event.title : '';
 }
 
 // One number box, e.g. label "Dose", value "500 mg"

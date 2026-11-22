@@ -538,10 +538,10 @@ document.addEventListener('DOMContentLoaded', () => {
     function fillEventOptions() {
       const select = document.getElementById('rx-event');
       select.length = 1; // keep "None (walk-in)"
-      PatientStore.getAllSchedule().forEach((ev) => {
+      EventStore.getAll().forEach((ev) => {
         const opt = document.createElement('option');
         opt.value = ev.id;
-        opt.textContent = `${ev.reason || 'Health event'} (${ev.date})`;
+        opt.textContent = `${ev.title} (${ev.date})`;
         select.appendChild(opt);
       });
     }
