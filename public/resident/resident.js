@@ -178,63 +178,54 @@ function renderPrescriptions() {
   });
 }
 
+// "13:30" -> "1:30 PM"
+function formatTime12(hhmm) {
+  if (!hhmm) return '';
+  const [h, m] = hhmm.split(':').map(Number);
+  const suffix = h >= 12 ? 'PM' : 'AM';
+  return `${h % 12 || 12}:${String(m).padStart(2, '0')} ${suffix}`;
+}
+
 function renderSchedule() {
-  const tbody = document.getElementById('schedule-table-body');
-  if (!tbody) return;
+  const list = document.getElementById('events-list');
+  const emptyEl = document.getElementById('events-empty');
+  if (!list) return;
 
-  const patient = getMyPatient();
-  const entries = patient ? patient.schedule : [];
-  tbody.innerHTML = '';
+  const now = new Date();
+  const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  const events = EventStore.getUpcoming(today);
+  list.innerHTML = '';
+  if (emptyEl) emptyEl.hidden = events.length > 0;
 
-  if (entries.length === 0) {
-    if (typeof KalingaCalendar !== 'undefined') KalingaCalendar.render();
-    return;
-  }
+  events.forEach((ev) => {
+    const [y, m, d] = ev.date.split('-').map(Number);
+    const dateObj = new Date(y, m - 1, d);
 
-  entries.forEach((entry) => {
-    const tr = document.createElement('tr');
-    tr.className = 'patient-row-clickable';
-    tr.title = 'Click to view appointment details';
-    tr.addEventListener('click', () => {
-      if (typeof showAppointmentDetailsModal === 'function') {
-        showAppointmentDetailsModal(entry, 'resident', () => {
-          renderSchedule();
-          renderDashboardStats();
-        });
-      }
-    });
+    const card = makeEl('article', 'event-card');
 
-    const dateTd = document.createElement('td');
-    dateTd.className = 'col-date' + (!entry.date ? ' table-empty-val' : '');
-    dateTd.dataset.label = 'Date';
-    dateTd.textContent = entry.date || '-';
-    dateTd.title = entry.date || '-';
-    tr.appendChild(dateTd);
+    // Big date badge, e.g. "DEC 3" (hidden from screen readers; the full date is read below)
+    const badge = makeEl('div', 'event-date-badge');
+    badge.setAttribute('aria-hidden', 'true');
+    badge.appendChild(makeEl('span', 'event-date-month', dateObj.toLocaleDateString('en-PH', { month: 'short' }).toUpperCase()));
+    badge.appendChild(makeEl('span', 'event-date-day', String(d)));
+    card.appendChild(badge);
 
-    const timeTd = document.createElement('td');
-    timeTd.className = 'col-time' + (!entry.time ? ' table-empty-val' : '');
-    timeTd.dataset.label = 'Time';
-    timeTd.textContent = entry.time || '-';
-    timeTd.title = entry.time || '-';
-    tr.appendChild(timeTd);
+    const body = makeEl('div', 'event-card-body');
+    body.appendChild(makeEl('h3', 'event-title', ev.title));
+    if (ev.audience) body.appendChild(makeEl('p', 'event-audience', `For: ${ev.audience}`));
+    const fullDate = dateObj.toLocaleDateString('en-PH', { weekday: 'long', month: 'long', day: 'numeric' });
+    const time = ev.endTime
+      ? `${formatTime12(ev.startTime)} – ${formatTime12(ev.endTime)}`
+      : formatTime12(ev.startTime);
+    body.appendChild(makeEl('p', 'event-meta', `${fullDate}, ${time}`));
+    body.appendChild(makeEl('p', 'event-meta', ev.location));
+    if (ev.notes) body.appendChild(makeEl('p', 'event-notes', ev.notes));
+    card.appendChild(body);
 
-    const reasonTd = document.createElement('td');
-    reasonTd.className = 'col-reason' + (!entry.reason ? ' table-empty-val' : '');
-    reasonTd.dataset.label = 'Reason';
-    reasonTd.textContent = entry.reason || '-';
-    reasonTd.title = entry.reason || '-';
-    tr.appendChild(reasonTd);
-
-    const statusTd = document.createElement('td');
-    statusTd.className = 'col-status';
-    statusTd.dataset.label = 'Status';
-    statusTd.appendChild(entry.status === 'confirmed' ? statusPill('Confirmed', 'confirmed') : statusPill('Requested', 'requested'));
-    tr.appendChild(statusTd);
-
-    tbody.appendChild(tr);
+    list.appendChild(card);
   });
 
-  if (typeof KalingaCalendar !== 'undefined') {
+  if (typeof KalingaCalendar !== 'undefined' && KalingaCalendar.container) {
     KalingaCalendar.render();
   }
 }
