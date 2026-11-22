@@ -346,116 +346,63 @@ function renderPrescriptionsTable(searchQuery = '') {
   });
 }
 
+// "13:30" -> "1:30 PM"
+function formatTime12(hhmm) {
+  if (!hhmm) return '';
+  const [h, m] = hhmm.split(':').map(Number);
+  const suffix = h >= 12 ? 'PM' : 'AM';
+  return `${h % 12 || 12}:${String(m).padStart(2, '0')} ${suffix}`;
+}
+
 function renderScheduleTable() {
   const tbody = document.getElementById('schedule-table-body');
   if (!tbody) return;
 
-  const entries = PatientStore.getAllSchedule();
+  const now = new Date();
+  const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  const all = EventStore.getAll();
+  // Upcoming first (soonest on top), then past events (most recent first)
+  const upcoming = all.filter((ev) => ev.date >= today);
+  const past = all.filter((ev) => ev.date < today).reverse();
+  const entries = upcoming.concat(past);
+
   tbody.innerHTML = '';
 
   if (entries.length === 0) {
-    if (typeof KalingaCalendar !== 'undefined') KalingaCalendar.render();
-    return;
+    const tr = document.createElement('tr');
+    const td = document.createElement('td');
+    td.colSpan = 5;
+    td.className = 'table-empty-val';
+    td.textContent = 'No events yet.';
+    tr.appendChild(td);
+    tbody.appendChild(tr);
   }
 
-  entries.forEach((entry) => {
+  entries.forEach((ev) => {
     const tr = document.createElement('tr');
-    tr.className = 'patient-row-clickable';
-    tr.title = 'Click to view appointment details';
-    tr.addEventListener('click', (e) => {
-      if (e.target.closest('button')) return;
-      if (typeof showAppointmentDetailsModal === 'function') {
-        showAppointmentDetailsModal(entry, 'staff', () => {
-          renderScheduleTable();
-          renderDashboardStats();
-        });
-      }
+    if (ev.date < today) tr.className = 'event-row--past';
+    const time = ev.endTime
+      ? `${formatTime12(ev.startTime)} – ${formatTime12(ev.endTime)}`
+      : formatTime12(ev.startTime);
+    const cells = [
+      ['col-date', 'Date', ev.date],
+      ['col-time', 'Time', time],
+      ['col-reason', 'Event', ev.title],
+      ['col-location', 'Location', ev.location],
+      ['col-audience', 'Who should attend', ev.audience || '-']
+    ];
+    cells.forEach(([className, label, text]) => {
+      const td = document.createElement('td');
+      td.className = className;
+      td.dataset.label = label;
+      td.textContent = text;
+      td.title = text;
+      tr.appendChild(td);
     });
-
-    const patientTd = document.createElement('td');
-    patientTd.className = 'col-patient';
-    patientTd.dataset.label = 'Patient';
-    patientTd.textContent = entry.patientName;
-    patientTd.title = entry.patientName;
-    tr.appendChild(patientTd);
-
-    const dateTd = document.createElement('td');
-    dateTd.className = 'col-date' + (!entry.date ? ' table-empty-val' : '');
-    dateTd.dataset.label = 'Date';
-    dateTd.textContent = entry.date || '-';
-    dateTd.title = entry.date || '-';
-    tr.appendChild(dateTd);
-
-    const timeTd = document.createElement('td');
-    timeTd.className = 'col-time' + (!entry.time ? ' table-empty-val' : '');
-    timeTd.dataset.label = 'Time';
-    timeTd.textContent = entry.time || '-';
-    timeTd.title = entry.time || '-';
-    tr.appendChild(timeTd);
-
-    const reasonTd = document.createElement('td');
-    reasonTd.className = 'col-reason' + (!entry.reason ? ' table-empty-val' : '');
-    reasonTd.dataset.label = 'Reason';
-    reasonTd.textContent = entry.reason || '-';
-    reasonTd.title = entry.reason || '-';
-    tr.appendChild(reasonTd);
-
-    const statusTd = document.createElement('td');
-    statusTd.className = 'col-status';
-    statusTd.dataset.label = 'Status';
-    statusTd.appendChild(entry.status === 'confirmed' ? statusPill('Confirmed', 'confirmed') : statusPill('Requested', 'requested'));
-    tr.appendChild(statusTd);
-
-    const actionsTd = document.createElement('td');
-    actionsTd.className = 'actions-cell col-actions';
-
-    if (entry.status === 'requested') {
-      const confirmBtn = makeIconRowBtn({ action: 'confirm', label: 'Confirm appointment', extraClass: 'success' });
-      confirmBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        PatientStore.confirmAppointment(entry.patientId, entry.id);
-        renderScheduleTable();
-        renderDashboardStats();
-        showToast('Appointment confirmed.');
-      });
-      actionsTd.appendChild(confirmBtn);
-    }
-
-    const detailsBtn = makeIconRowBtn({ action: 'details', label: 'View details' });
-    detailsBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      showAppointmentDetailsModal(entry, 'staff', () => {
-        renderScheduleTable();
-        renderDashboardStats();
-      });
-    });
-    actionsTd.appendChild(detailsBtn);
-
-    const cancelBtn = makeIconRowBtn({ action: 'cancel', label: 'Cancel appointment', extraClass: 'danger' });
-    cancelBtn.addEventListener('click', async (e) => {
-      e.stopPropagation();
-      const ok = await confirmDialog({
-        title: 'Cancel Appointment?',
-        message: `Cancel the appointment for ${entry.patientName}?`,
-        confirmLabel: 'Yes, Cancel',
-        danger: true
-      });
-      if (ok) {
-        PatientStore.cancelAppointment(entry.id);
-        renderScheduleTable();
-        renderDashboardStats();
-        showToast('Appointment cancelled.');
-      }
-    });
-    actionsTd.appendChild(cancelBtn);
-
-    tr.appendChild(actionsTd);
     tbody.appendChild(tr);
   });
 
-  if (typeof KalingaCalendar !== 'undefined') {
-    KalingaCalendar.render();
-  }
+  if (typeof KalingaCalendar !== 'undefined') KalingaCalendar.render();
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -681,7 +628,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('sch-date').min = getToday();
         schForm.addEventListener('submit', (e) => {
       e.preventDefault();
-      
+
       const date = document.getElementById('sch-date').value;
       if (date < getToday()) {
         showToast('Events cannot be set in the past. Please choose today or a future date.');

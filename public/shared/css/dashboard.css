@@ -1465,14 +1465,7 @@ body {
   text-align: left;
 }
 
-/* Staff Schedule: Patient: 20% (Left), Date: 14% (Center), Time: 12% (Center), Reason: 24% (Left), Status: 14% (Center), Actions: 16% (Center) */
-.data-table--staff-schedule col.col-patient,
-.data-table--staff-schedule th.col-patient,
-.data-table--staff-schedule td.col-patient {
-  width: 20%;
-  text-align: left;
-}
-
+/* Staff Events: Date 14% (Center), Time 20% (Center), Event 28% (Left), Location 22% (Left), Who should attend 16% (Left) */
 .data-table--staff-schedule col.col-date,
 .data-table--staff-schedule th.col-date,
 .data-table--staff-schedule td.col-date {
@@ -1483,30 +1476,37 @@ body {
 .data-table--staff-schedule col.col-time,
 .data-table--staff-schedule th.col-time,
 .data-table--staff-schedule td.col-time {
-  width: 12%;
+  width: 20%;
   text-align: center;
 }
 
 .data-table--staff-schedule col.col-reason,
 .data-table--staff-schedule th.col-reason,
 .data-table--staff-schedule td.col-reason {
-  width: 24%;
+  width: 28%;
   text-align: left;
 }
 
-.data-table--staff-schedule col.col-status,
-.data-table--staff-schedule th.col-status,
-.data-table--staff-schedule td.col-status {
-  width: 14%;
-  text-align: center;
+.data-table--staff-schedule col.col-location,
+.data-table--staff-schedule th.col-location,
+.data-table--staff-schedule td.col-location {
+  width: 22%;
+  text-align: left;
 }
 
-.data-table--staff-schedule col.col-actions,
-.data-table--staff-schedule th.col-actions,
-.data-table--staff-schedule td.col-actions {
+.data-table--staff-schedule col.col-audience,
+.data-table--staff-schedule th.col-audience,
+.data-table--staff-schedule td.col-audience {
   width: 16%;
-  text-align: center;
+  text-align: left;
 }
+
+/* Past events look faded so upcoming ones stand out */
+.event-row--past td {
+  color: var(--color-text-muted);
+  opacity: 0.6;
+}
+
 
 /* ---------- Resident Dashboard Tables Column Specifications ---------- */
 /* Resident Prescriptions: Medicine: 35% (Left), Notes: 45% (Left), Status: 20% (Center) */
