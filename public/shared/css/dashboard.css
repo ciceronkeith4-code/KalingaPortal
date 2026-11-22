@@ -1375,42 +1375,42 @@ body {
   text-align: center;
 }
 
-/* ---------- Admin Schedule Table Column Specifications ----------
-   Patient: 25% (Left), Date: 16% (Center), Time: 14% (Center), Reason: 30% (Left), Status: 15% (Center)
+/* ---------- Admin Events Table Column Specifications ----------
+   Date: 14% (Center), Time: 20% (Center), Event: 28% (Left), Location: 22% (Left), Who should attend: 16% (Left)
    ----------------------------------------------------------------- */
-.data-table--schedule col.col-patient,
-.data-table--schedule th.col-patient,
-.data-table--schedule td.col-patient {
-  width: 25%;
-  text-align: left;
-}
-
-.data-table--schedule col.col-date,
+.data-table--schedule col.col-date, 
 .data-table--schedule th.col-date,
 .data-table--schedule td.col-date {
-  width: 16%;
+  width: 14%;
   text-align: center;
 }
 
 .data-table--schedule col.col-time,
 .data-table--schedule th.col-time,
 .data-table--schedule td.col-time {
-  width: 14%;
+  width: 20%;
   text-align: center;
 }
 
 .data-table--schedule col.col-reason,
 .data-table--schedule th.col-reason,
 .data-table--schedule td.col-reason {
-  width: 30%;
+  width: 28%;
   text-align: left;
 }
 
-.data-table--schedule col.col-status,
-.data-table--schedule th.col-status,
-.data-table--schedule td.col-status {
-  width: 15%;
-  text-align: center;
+.data-table--schedule col.col-location,
+.data-table--schedule th.col-location,
+.data-table--schedule td.col-location {
+  width: 22%;
+  text-align: left;
+}
+
+.data-table--schedule col.col-audience,
+.data-table--schedule th.col-audience,
+.data-table--schedule td.col-audience {
+  width: 16%;
+  text-align: left;
 }
 
 /* ---------- Staff Dashboard Tables Column Specifications ---------- */
@@ -1465,14 +1465,7 @@ body {
   text-align: left;
 }
 
-/* Staff Schedule: Patient: 20% (Left), Date: 14% (Center), Time: 12% (Center), Reason: 24% (Left), Status: 14% (Center), Actions: 16% (Center) */
-.data-table--staff-schedule col.col-patient,
-.data-table--staff-schedule th.col-patient,
-.data-table--staff-schedule td.col-patient {
-  width: 20%;
-  text-align: left;
-}
-
+/* Staff Events: Date 14% (Center), Time 20% (Center), Event 28% (Left), Location 22% (Left), Who should attend 16% (Left) */
 .data-table--staff-schedule col.col-date,
 .data-table--staff-schedule th.col-date,
 .data-table--staff-schedule td.col-date {
@@ -1483,30 +1476,37 @@ body {
 .data-table--staff-schedule col.col-time,
 .data-table--staff-schedule th.col-time,
 .data-table--staff-schedule td.col-time {
-  width: 12%;
+  width: 20%;
   text-align: center;
 }
 
 .data-table--staff-schedule col.col-reason,
 .data-table--staff-schedule th.col-reason,
 .data-table--staff-schedule td.col-reason {
-  width: 24%;
+  width: 28%;
   text-align: left;
 }
 
-.data-table--staff-schedule col.col-status,
-.data-table--staff-schedule th.col-status,
-.data-table--staff-schedule td.col-status {
-  width: 14%;
-  text-align: center;
+.data-table--staff-schedule col.col-location,
+.data-table--staff-schedule th.col-location,
+.data-table--staff-schedule td.col-location {
+  width: 22%;
+  text-align: left;
 }
 
-.data-table--staff-schedule col.col-actions,
-.data-table--staff-schedule th.col-actions,
-.data-table--staff-schedule td.col-actions {
+.data-table--staff-schedule col.col-audience,
+.data-table--staff-schedule th.col-audience,
+.data-table--staff-schedule td.col-audience {
   width: 16%;
-  text-align: center;
+  text-align: left;
 }
+
+/* Past events look faded so upcoming ones stand out */
+.event-row--past td {
+  color: var(--color-text-muted);
+  opacity: 0.6;
+}
+
 
 /* ---------- Resident Dashboard Tables Column Specifications ---------- */
 /* Resident Prescriptions: Medicine: 35% (Left), Notes: 45% (Left), Status: 20% (Center) */
@@ -4185,4 +4185,103 @@ body {
 
 .rx-add-med-btn {
   margin-top: 12px;
+}
+
+/* ===== Resident event cards ===== */
+.event-card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: 16px 0 24px;
+}
+
+.event-card {
+  display: flex;
+  gap: 16px;
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-border);
+  border-radius: 14px;
+  padding: 16px 18px;
+}
+
+/* Big date badge, e.g. DEC 3 */
+.event-date-badge {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 68px;
+  border-radius: 12px;
+  background: var(--navy-subtle);
+  color: var(--navy-primary);
+}
+
+.event-date-month {
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+.event-date-day {
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.event-card-body {
+  flex: 1;
+  min-width: 0;   /* lets long titles wrap instead of overflowing */
+}
+
+.event-title {
+  margin: 0;
+  font-size: 1.15rem;
+  color: var(--color-text-primary);
+}
+
+.event-audience {
+  display: inline-block;
+  margin: 6px 0 2px;
+  padding: 3px 12px;
+  border-radius: var(--radius-pill);
+  background: var(--navy-subtle);
+  color: var(--navy-dark);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.event-meta {
+  margin: 4px 0 0;
+  font-size: 1rem;
+  color: var(--color-text-secondary);
+}
+
+.event-notes {
+  margin: 8px 0 0;
+  font-size: 0.95rem;
+  color: var(--color-text-secondary);
+  font-style: italic;
+}
+
+.event-empty {
+  margin: 16px 0;
+  font-size: 1rem;
+  color: var(--color-text-secondary);
+}
+
+
+/* "Today" / "Tonight" / "Tomorrow" badge on resident event cards */
+.event-when {
+  display: inline-block;
+  margin-bottom: 6px;
+  padding: 3px 12px;
+  border-radius: var(--radius-pill);
+  background: var(--red-primary);
+  color: #FFFFFF;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
 }

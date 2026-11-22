@@ -214,7 +214,7 @@
 
         <div class="stat-card stat-card--blue">
           <div class="stat-card-top">
-            <span class="stat-label">Total Appointments</span>
+            <span class="stat-label">Upcoming Events</span>
             <div class="stat-card-icon" aria-hidden="true">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                 <rect x="3" y="4" width="18" height="18" rx="2"></rect>
@@ -343,24 +343,24 @@
     <section class="view" id="view-schedule" hidden>
       <div class="section-card">
         <h2>Events</h2>
-        <p class="section-sub">Barangay 603 healthcare appointments. Click any date or appointment chip to view consultation details.</p>
+        <p class="section-sub">All health events and checkups posted for barangay residents.</p>
         <div id="calendar-widget-container"></div>
         <div class="table-container table-container--schedule">
           <table class="data-table data-table--schedule data-table--admin-schedule">
             <colgroup>
-              <col class="col-patient" style="width: 25%;">
-              <col class="col-date" style="width: 16%;">
-              <col class="col-time" style="width: 14%;">
-              <col class="col-reason" style="width: 30%;">
-              <col class="col-status" style="width: 15%;">
+              <col class="col-date" style="width: 14%;">
+              <col class="col-time" style="width: 20%;">
+              <col class="col-reason" style="width: 28%;">
+              <col class="col-location" style="width: 22%;">
+              <col class="col-audience" style="width: 16%;">
             </colgroup>
-            <thead>
-              <tr>
-                <th class="col-patient">Patient</th>
+            <thead> 
+              <tr>  
                 <th class="col-date">Date</th>
                 <th class="col-time">Time</th>
-                <th class="col-reason">Reason</th>
-                <th class="col-status">Status</th>
+                <th class="col-reason">Event</th>
+                <th class="col-location">Location</th>
+                <th class="col-audience">Who should attend</th>
               </tr>
             </thead>
             <tbody id="schedule-table-body"></tbody>

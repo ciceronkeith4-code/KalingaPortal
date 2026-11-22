@@ -77,13 +77,15 @@ const KalingaCalendar = {
     ];
     const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-    // Load appointments from PatientStore
+        // Load general events from EventStore (every resident sees all events)
     let allAppointments = [];
-    if (typeof PatientStore !== 'undefined' && PatientStore.getAllSchedule) {
-      allAppointments = PatientStore.getAllSchedule();
-    }
-    if (this.role === 'resident' && typeof session !== 'undefined' && session) {
-      allAppointments = allAppointments.filter((a) => a.patientUsername === session.username);
+    if (typeof EventStore !== 'undefined') {
+      allAppointments = EventStore.getAll().map((ev) => ({
+        ...ev,
+        time: ev.startTime,
+        reason: ev.title,
+        status: 'confirmed'
+      }));
     }
 
     // Clear container
@@ -261,7 +263,7 @@ const KalingaCalendar = {
           ? 'cal-appt-chip--confirmed'
           : (appt.status === 'cancelled' ? 'cal-appt-chip--cancelled' : 'cal-appt-chip--requested');
         chip.className = `cal-appt-chip ${statusClass}`;
-        chip.title = `${appt.time || 'All Day'} · ${appt.patientName || appt.patientUsername}: ${appt.reason || 'Consultation'} (${appt.status})`;
+                chip.title = `${appt.time} · ${appt.title} · ${appt.location}`;
 
         const timeSpan = document.createElement('span');
         timeSpan.className = 'cal-chip-time';
@@ -269,18 +271,11 @@ const KalingaCalendar = {
 
         const titleSpan = document.createElement('span');
         titleSpan.className = 'cal-chip-title';
-        titleSpan.textContent = appt.patientName ? `${appt.patientName} (${appt.reason || 'Visit'})` : (appt.reason || 'Appointment');
+                titleSpan.textContent = appt.title;
 
         chip.appendChild(timeSpan);
         chip.appendChild(titleSpan);
-
-        chip.addEventListener('click', (e) => {
-          e.stopPropagation();
-          showAppointmentDetailsModal(appt, this.role, () => {
-            this.render();
-            if (typeof this.onUpdate === 'function') this.onUpdate();
-          });
-        });
+        
 
         apptsList.appendChild(chip);
       });
