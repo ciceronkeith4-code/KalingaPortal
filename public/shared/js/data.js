@@ -283,3 +283,63 @@ const PatientStore = {
 };
 
 window.PatientStore = PatientStore;
+
+
+// ===== General barangay events (not tied to one patient) =====
+const EVENTS_KEY = 'kalinga_events';
+
+function loadEvents() {
+  try {
+    return JSON.parse(localStorage.getItem(EVENTS_KEY)) || [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function saveEvents(events) {
+  localStorage.setItem(EVENTS_KEY, JSON.stringify(events));
+}
+
+const EventStore = {
+  // All events, soonest first
+  getAll() {
+    return loadEvents().sort((a, b) =>
+      (a.date + a.startTime).localeCompare(b.date + b.startTime));
+  },
+
+  // Only events from today onward (what residents see)
+  getUpcoming(today) {
+    return this.getAll().filter((ev) => ev.date >= today);
+  },
+
+  getById(id) {
+    return loadEvents().find((ev) => ev.id === id) || null;
+  },
+
+  // Staff: post a new event
+  // details = { title, date, startTime, endTime, location, audience, notes }
+  create(details) {
+    if (!details.title || !details.date || !details.startTime || !details.location) {
+      return { ok: false, error: 'Title, date, start time, and location are required.' };
+    }
+    if (details.endTime && details.endTime <= details.startTime) {
+      return { ok: false, error: 'End time must be after the start time.' };
+    }
+    const events = loadEvents();
+    events.push({
+      id: genId('ev'),
+      title: details.title,
+      date: details.date,
+      startTime: details.startTime,
+      endTime: details.endTime || null,
+      location: details.location,
+      audience: details.audience || '',
+      notes: details.notes || '',
+      createdAt: new Date().toISOString()
+    });
+    saveEvents(events);
+    return { ok: true };
+  }
+};
+
+window.EventStore = EventStore;
