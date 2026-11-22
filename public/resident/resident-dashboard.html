@@ -246,26 +246,7 @@
       <div class="section-card">
         <h2>My Prescriptions</h2>
         <p class="section-sub">View prescriptions given to you after your checkups.</p>
-
-
-
-        <div class="table-container">
-          <table class="data-table data-table--resident-prescriptions">
-            <colgroup>
-              <col class="col-medicine" style="width: 35%;">
-              <col class="col-notes" style="width: 45%;">
-              <col class="col-status" style="width: 20%;">
-            </colgroup>
-            <thead>
-              <tr>
-                <th class="col-medicine">Medicine</th>
-                <th class="col-notes">Notes</th>
-                <th class="col-status">Status</th>
-              </tr>
-            </thead>
-            <tbody id="prescriptions-table-body"></tbody>
-          </table>
-        </div>
+        <div class="rx-card-list" id="prescriptions-list"></div>
         <div class="empty-state" id="prescriptions-empty" hidden>
           <div class="empty-state-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">

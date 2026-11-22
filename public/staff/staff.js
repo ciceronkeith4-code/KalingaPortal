@@ -16,7 +16,9 @@ function renderDashboardStats() {
   const apptEl = document.getElementById('stat-total-appointments');
 
   if (activeEl) activeEl.textContent = patients.filter((p) => !p.archived).length;
-  if (pendingRxEl) pendingRxEl.textContent = allRx.filter((rx) => rx.status === 'requested').length;
+    const now = new Date();
+  const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  if (pendingRxEl) pendingRxEl.textContent = allRx.filter((rx) => rx.dateGiven === todayStr).length;
   if (archivedEl) archivedEl.textContent = patients.filter((p) => p.archived).length;
   if (apptEl) apptEl.textContent = allSchedule.length;
 }
@@ -284,25 +286,36 @@ function renderPrescriptionsTable(searchQuery = '') {
   const countBadge = document.getElementById('rx-records-count');
   if (!tbody) return;
 
-  let entries = PatientStore.getAllPrescriptions();
+  // Adds one table cell with safe text
+  function addCell(tr, className, label, text) {
+    const td = document.createElement('td');
+    td.className = className;
+    td.dataset.label = label;
+    td.textContent = text;
+    td.title = text;
+    tr.appendChild(td);
+  }
+
+  // New-format prescriptions only (with a medicines list), newest first
+  let entries = PatientStore.getAllPrescriptions()
+    .filter((rx) => Array.isArray(rx.medicines))
+    .sort((a, b) => b.dateGiven.localeCompare(a.dateGiven));
   const totalCount = entries.length;
 
   if (searchQuery) {
     const q = searchQuery.toLowerCase();
     entries = entries.filter((rx) =>
       (rx.patientName && rx.patientName.toLowerCase().includes(q)) ||
-      (rx.medicine && rx.medicine.toLowerCase().includes(q)) ||
-      (rx.notes && rx.notes.toLowerCase().includes(q)) ||
-      (rx.status && rx.status.toLowerCase().includes(q))
+      (rx.doctorName && rx.doctorName.toLowerCase().includes(q)) ||
+      rx.dateGiven.includes(q) ||
+      rx.medicines.some((m) => m.name.toLowerCase().includes(q))
     );
   }
 
   if (countBadge) {
-    if (searchQuery) {
-      countBadge.textContent = `${entries.length} of ${totalCount} records`;
-    } else {
-      countBadge.textContent = `${totalCount} records total`;
-    }
+    countBadge.textContent = searchQuery
+      ? `${entries.length} of ${totalCount} records`
+      : `${totalCount} records total`;
   }
 
   tbody.innerHTML = '';
@@ -312,11 +325,9 @@ function renderPrescriptionsTable(searchQuery = '') {
       emptyEl.hidden = false;
       emptyEl.style.display = 'flex';
       const msgNode = emptyEl.querySelector('.empty-state-msg') || emptyEl.lastChild;
-      if (searchQuery) {
-        msgNode.textContent = `No prescriptions found matching "${searchQuery}".`;
-      } else {
-        msgNode.textContent = 'No prescriptions yet.';
-      }
+      msgNode.textContent = searchQuery
+        ? `No prescriptions found matching "${searchQuery}".`
+        : 'No prescriptions yet.';
     }
     return;
   }
@@ -327,117 +338,10 @@ function renderPrescriptionsTable(searchQuery = '') {
 
   entries.forEach((rx) => {
     const tr = document.createElement('tr');
-    tr.className = 'patient-row-clickable';
-    tr.title = 'Click to view prescription details';
-    tr.addEventListener('click', (e) => {
-      if (e.target.closest('button')) return;
-      showPrescriptionDetailsModal(rx, 'staff', () => {
-        renderPrescriptionsTable(document.getElementById('rx-table-search')?.value.trim() || '');
-        renderDashboardStats();
-      });
-    });
-
-    const patientTd = document.createElement('td');
-    patientTd.className = 'col-patient';
-    patientTd.dataset.label = 'Patient';
-    patientTd.textContent = rx.patientName;
-    patientTd.title = rx.patientName;
-    tr.appendChild(patientTd);
-
-    const medTd = document.createElement('td');
-    medTd.className = 'col-medicine';
-    medTd.dataset.label = 'Medicine';
-    medTd.textContent = rx.medicine;
-    medTd.title = rx.medicine;
-    tr.appendChild(medTd);
-
-    const notesTd = document.createElement('td');
-    notesTd.className = 'col-notes' + (!rx.notes ? ' table-empty-val' : '');
-    notesTd.dataset.label = 'Notes';
-    notesTd.textContent = rx.notes || '-';
-    notesTd.title = rx.notes || '-';
-    tr.appendChild(notesTd);
-
-    const statusTd = document.createElement('td');
-    statusTd.className = 'col-status';
-    statusTd.dataset.label = 'Status';
-    statusTd.appendChild(rx.status === 'fulfilled' ? statusPill('Fulfilled', 'fulfilled') : statusPill('Requested', 'requested'));
-    tr.appendChild(statusTd);
-
-    const actionsTd = document.createElement('td');
-    actionsTd.className = 'actions-cell col-actions';
-
-    if (rx.status === 'requested') {
-      // Fulfill button
-      const fulfillBtn = makeIconRowBtn({ action: 'fulfill', label: 'Fulfill prescription', extraClass: 'success' });
-      fulfillBtn.addEventListener('click', async (e) => {
-        e.stopPropagation();
-        const ok = await confirmDialog({
-          title: 'Fulfill Prescription?',
-          message: `Confirm that ${rx.medicine || 'this medicine'} has been dispensed to ${rx.patientName}.`,
-          confirmLabel: 'Yes, Fulfill'
-        });
-        if (!ok) return;
-        PatientStore.fulfillPrescription(rx.patientId, rx.id);
-        renderPrescriptionsTable(document.getElementById('rx-table-search')?.value.trim() || '');
-        renderDashboardStats();
-        showToast('Prescription fulfilled.');
-      });
-      actionsTd.appendChild(fulfillBtn);
-
-      // Details button
-      const detailsBtn = makeIconRowBtn({ action: 'details', label: 'View details' });
-      detailsBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        showPrescriptionDetailsModal(rx, 'staff', () => {
-          renderPrescriptionsTable(document.getElementById('rx-table-search')?.value.trim() || '');
-          renderDashboardStats();
-        });
-      });
-      actionsTd.appendChild(detailsBtn);
-
-      // Cancel button
-      const cancelBtn = makeIconRowBtn({ action: 'cancel', label: 'Cancel prescription', extraClass: 'danger' });
-      cancelBtn.addEventListener('click', async (e) => {
-        e.stopPropagation();
-        const ok = await confirmDialog({
-          title: 'Cancel Prescription?',
-          message: `Are you sure you want to cancel the prescription for ${rx.patientName}?`,
-          confirmLabel: 'Yes, Cancel',
-          danger: true
-        });
-        if (ok) {
-          PatientStore.deletePrescription(rx.patientId, rx.id);
-          renderPrescriptionsTable(document.getElementById('rx-table-search')?.value.trim() || '');
-          renderDashboardStats();
-          showToast('Prescription cancelled.');
-        }
-      });
-      actionsTd.appendChild(cancelBtn);
-    } else {
-      // Fulfilled status: Details button
-      const detailsBtn = makeIconRowBtn({ action: 'details', label: 'View details' });
-      detailsBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        showPrescriptionDetailsModal(rx, 'staff', () => {
-          renderPrescriptionsTable(document.getElementById('rx-table-search')?.value.trim() || '');
-          renderDashboardStats();
-        });
-      });
-      actionsTd.appendChild(detailsBtn);
-
-      // Print Slip button
-      const printBtn = makeIconRowBtn({ action: 'print', label: 'Print slip' });
-      printBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        printPrescriptionSlip(rx);
-      });
-      actionsTd.appendChild(printBtn);
-
-      
-    }
-
-    tr.appendChild(actionsTd);
+    addCell(tr, 'col-patient', 'Patient', rx.patientName);
+    addCell(tr, 'col-date', 'Date given', rx.dateGiven);
+    addCell(tr, 'col-doctor', 'Doctor', rx.doctorName);
+    addCell(tr, 'col-medicine', 'Medicines', rx.medicines.map((m) => m.name).join(', '));
     tbody.appendChild(tr);
   });
 }
@@ -636,6 +540,71 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const rxForm = document.getElementById('prescription-form');
   if (rxForm) {
+        const MAX_MEDICINES = 5;
+    const medRows = document.getElementById('rx-med-rows');
+    const addMedBtn = document.getElementById('rx-add-med');
+    let medRowCount = 0;
+
+    // Today's date as YYYY-MM-DD (local time)
+    function rxToday() {
+      const now = new Date();
+      return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    }
+
+    // Adds one empty medicine row (max 5)
+    function addMedRow() {
+      if (medRows.children.length >= MAX_MEDICINES) return;
+      medRowCount += 1;
+      const n = medRowCount;
+      const row = document.createElement('div');
+      row.className = 'rx-med-row';
+      row.innerHTML = `
+        <div class="form-field rx-med-name-field"><label for="med-name-${n}">Medicine</label><input type="text" id="med-name-${n}" class="med-name" placeholder="e.g. Amoxicillin" required></div>
+        <div class="form-field"><label for="med-dose-${n}">Dose</label><input type="number" id="med-dose-${n}" class="med-dose" min="0" step="any" required></div>
+        <div class="form-field"><label for="med-unit-${n}">Unit</label><select id="med-unit-${n}" class="med-unit"><option>mg</option><option>ml</option><option>tablet</option></select></div>
+        <div class="form-field"><label for="med-times-${n}">Times a day</label><input type="number" id="med-times-${n}" class="med-times" min="1" max="24" required></div>
+        <div class="form-field"><label for="med-days-${n}">Days</label><input type="number" id="med-days-${n}" class="med-days" min="1" required></div>
+        <div class="form-field rx-med-note-field"><label for="med-note-${n}">Note (optional)</label><input type="text" id="med-note-${n}" class="med-note" placeholder="e.g. After meals"></div>
+        <button type="button" class="rx-btn rx-remove-med-btn">Remove this row</button>`;
+      row.querySelector('.rx-remove-med-btn').addEventListener('click', () => {
+        row.remove();
+        updateMedButtons();
+      });
+      medRows.appendChild(row);
+      updateMedButtons();
+    }
+
+    // Hide "Remove" when only 1 row is left, and hide "Add" at 5 rows
+    function updateMedButtons() {
+      const rows = medRows.querySelectorAll('.rx-med-row');
+      rows.forEach((r) => { r.querySelector('.rx-remove-med-btn').hidden = rows.length === 1; });
+      addMedBtn.hidden = rows.length >= MAX_MEDICINES;
+    }
+
+    // Back to one empty row (after saving)
+    function resetMedRows() {
+      medRows.innerHTML = '';
+      addMedRow();
+    }
+
+    // Fill the Event list with events staff created
+    function fillEventOptions() {
+      const select = document.getElementById('rx-event');
+      select.length = 1; // keep "None (walk-in)"
+      PatientStore.getAllSchedule().forEach((ev) => {
+        const opt = document.createElement('option');
+        opt.value = ev.id;
+        opt.textContent = `${ev.reason || 'Health event'} (${ev.date})`;
+        select.appendChild(opt);
+      });
+    }
+
+    addMedBtn.addEventListener('click', addMedRow);
+    const rxDateInput = document.getElementById('rx-date');
+    rxDateInput.value = rxToday();
+    rxDateInput.max = rxToday(); // a prescription can't be given in the future
+    fillEventOptions();
+    resetMedRows();
     rxForm.addEventListener('submit', (e) => {
       e.preventDefault();
       let patientId = document.getElementById('rx-patient').value;
@@ -662,12 +631,30 @@ document.addEventListener('DOMContentLoaded', () => {
         if (rxSearchInput) rxSearchInput.focus();
         return;
       }
-      const medicine = document.getElementById('rx-medicine').value.trim();
-      const notes = document.getElementById('rx-notes').value.trim();
-      if (!medicine) return;
+            // Collect every medicine row into a list
+      const medicines = [...medRows.querySelectorAll('.rx-med-row')].map((row) => ({
+        name: row.querySelector('.med-name').value.trim(),
+        dose: Number(row.querySelector('.med-dose').value),
+        unit: row.querySelector('.med-unit').value,
+        timesPerDay: Number(row.querySelector('.med-times').value),
+        days: Number(row.querySelector('.med-days').value),
+        note: row.querySelector('.med-note').value.trim()
+      }));
 
-      PatientStore.addPrescription(patientId, medicine, notes);
+      const result = PatientStore.createPrescription(patientId, {
+        dateGiven: rxDateInput.value,
+        doctorName: document.getElementById('rx-doctor').value.trim(),
+        eventId: document.getElementById('rx-event').value || null,
+        medicines
+      });
+      if (!result.ok) {
+        showToast(result.error);
+        return;
+      }
+
       rxForm.reset();
+      resetMedRows();
+      rxDateInput.value = rxToday();
       if (rxSearchInput) rxSearchInput.value = '';
       document.getElementById('rx-patient').value = '';
       const clearBtn = document.getElementById('rx-patient-search-clear');

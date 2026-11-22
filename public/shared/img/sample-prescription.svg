@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800" role="img" aria-label="Sample prescription image">
+  <rect width="600" height="800" fill="#F7F4EC"/>
+  <text x="300" y="70" font-family="Georgia, serif" font-size="26" text-anchor="middle" fill="#222">Barangay 386 Health Center</text>
+  <text x="300" y="100" font-family="Georgia, serif" font-size="18" text-anchor="middle" fill="#555">Quiapo, Manila</text>
+  <line x1="40" y1="125" x2="560" y2="125" stroke="#222" stroke-width="2"/>
+  <text x="50" y="180" font-family="Georgia, serif" font-size="60" fill="#222">℞</text>
+  <text x="130" y="230" font-family="cursive" font-size="24" fill="#1B2A80">Amoxicillin 500mg - 3x a day, 7 days</text>
+  <text x="130" y="280" font-family="cursive" font-size="24" fill="#1B2A80">Paracetamol 500mg - 4x a day, 3 days</text>
+  <path d="M370 660 C 400 620, 430 700, 460 650 S 520 640, 540 665" stroke="#1B2A80" stroke-width="3" fill="none"/>
+  <line x1="340" y1="690" x2="560" y2="690" stroke="#222"/>
+  <text x="450" y="715" font-family="Georgia, serif" font-size="16" text-anchor="middle" fill="#555">Doctor's signature</text>
+  <text x="300" y="440" font-family="Arial, sans-serif" font-size="90" font-weight="bold" text-anchor="middle" fill="#E01E1E" opacity="0.18" transform="rotate(-25 300 440)">SAMPLE ONLY</text>
+</svg>

@@ -207,7 +207,7 @@
 
         <div class="stat-card stat-card--red">
           <div class="stat-card-top">
-            <span class="stat-label">Pending Prescriptions</span>
+            <span class="stat-label">Prescriptions Today</span>
             <div class="stat-card-icon" aria-hidden="true">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                 <rect x="8.5" y="3.5" width="7" height="17" rx="3.5" transform="rotate(45 12 12)"></rect>
@@ -345,9 +345,15 @@
                 <div class="patient-autocomplete-list" id="rx-patient-autocomplete" hidden></div>
               </div>
             </div>
-            <div class="form-field"><label for="rx-medicine">Medicine</label><input type="text" id="rx-medicine" placeholder="e.g. Paracetamol 500mg" required></div>
-            <div class="form-field"><label for="rx-notes">Notes</label><input type="text" id="rx-notes" placeholder="e.g. 1 tab every 4 hours as needed"></div>
+                        <div class="form-field"><label for="rx-date">Date given</label><input type="date" id="rx-date" required></div>
+            <div class="form-field"><label for="rx-doctor">Doctor</label><input type="text" id="rx-doctor" placeholder="e.g. Dr. Maria Santos" required></div>
+            <div class="form-field"><label for="rx-event">Event (optional)</label><select id="rx-event"><option value="">None (walk-in)</option></select></div>
           </div>
+          <fieldset class="rx-meds-fieldset">
+            <legend>Medicines</legend>
+            <div id="rx-med-rows"></div>
+            <button type="button" class="rx-btn rx-add-med-btn" id="rx-add-med">+ Add another medicine</button>
+          </fieldset>
           <div class="form-actions">
             <button type="submit" class="primary-btn">
               <svg class="btn-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -365,28 +371,26 @@
               <circle cx="11" cy="11" r="8"></circle>
               <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
             </svg>
-            <input type="text" id="rx-table-search" class="table-search-input" placeholder="Search prescriptions by patient, medicine, notes, status..." aria-label="Search prescriptions">
+            <input type="text" id="rx-table-search" class="table-search-input" placeholder="Search by patient, doctor, medicine, or date..." aria-label="Search prescriptions">
             <button type="button" class="table-search-clear-btn" id="rx-table-search-clear" hidden title="Clear search">✕</button>
           </div>
           <span class="table-records-badge" id="rx-records-count"></span>
         </div>
 
-        <div class="table-container">
+        <div class="table-container table-container--scroll">
           <table class="data-table data-table--prescriptions">
             <colgroup>
-              <col class="col-patient" style="width: 22%;">
-              <col class="col-medicine" style="width: 22%;">
-              <col class="col-notes" style="width: 24%;">
-              <col class="col-status" style="width: 14%;">
-              <col class="col-actions" style="width: 18%;">
+              <col class="col-patient" style="width: 24%;">
+              <col class="col-date" style="width: 16%;">
+              <col class="col-doctor" style="width: 22%;">
+              <col class="col-medicine" style="width: 38%;">
             </colgroup>
             <thead>
               <tr>
                 <th class="col-patient">Patient</th>
-                <th class="col-medicine">Medicine</th>
-                <th class="col-notes">Notes</th>
-                <th class="col-status">Status</th>
-                <th class="col-actions">Actions</th>
+                <th class="col-date">Date given</th>
+                <th class="col-doctor">Doctor</th>
+                <th class="col-medicine">Medicines</th>
               </tr>
             </thead>
             <tbody id="prescriptions-table-body"></tbody>

@@ -1436,10 +1436,24 @@ body {
   text-align: center;
 }
 
-/* Staff Prescriptions: Patient: 22% (Left), Medicine: 22% (Left), Notes: 24% (Left), Status: 14% (Center), Actions: 18% (Center) */
+/* Staff Prescriptions: Patient 24% (Left), Date given 16% (Center), Doctor 22% (Left), Medicines 38% (Left) */
 .data-table--prescriptions col.col-patient,
 .data-table--prescriptions th.col-patient,
 .data-table--prescriptions td.col-patient {
+  width: 24%;
+  text-align: left;
+}
+
+.data-table--prescriptions col.col-date,
+.data-table--prescriptions th.col-date,
+.data-table--prescriptions td.col-date {
+  width: 16%;
+  text-align: center;
+}
+
+.data-table--prescriptions col.col-doctor,
+.data-table--prescriptions th.col-doctor,
+.data-table--prescriptions td.col-doctor {
   width: 22%;
   text-align: left;
 }
@@ -1447,29 +1461,8 @@ body {
 .data-table--prescriptions col.col-medicine,
 .data-table--prescriptions th.col-medicine,
 .data-table--prescriptions td.col-medicine {
-  width: 22%;
+  width: 38%;
   text-align: left;
-}
-
-.data-table--prescriptions col.col-notes,
-.data-table--prescriptions th.col-notes,
-.data-table--prescriptions td.col-notes {
-  width: 24%;
-  text-align: left;
-}
-
-.data-table--prescriptions col.col-status,
-.data-table--prescriptions th.col-status,
-.data-table--prescriptions td.col-status {
-  width: 14%;
-  text-align: center;
-}
-
-.data-table--prescriptions col.col-actions,
-.data-table--prescriptions th.col-actions,
-.data-table--prescriptions td.col-actions {
-  width: 18%;
-  text-align: center;
 }
 
 /* Staff Schedule: Patient: 20% (Left), Date: 14% (Center), Time: 12% (Center), Reason: 24% (Left), Status: 14% (Center), Actions: 16% (Center) */
@@ -3972,4 +3965,224 @@ body {
     padding: 2px 4px;
     font-size: 0.65rem;
   }
+}
+
+
+/* ===== Resident prescription cards ===== */
+.rx-card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.rx-card {
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-border);
+  border-radius: 14px;
+  padding: 18px 20px;
+}
+
+.rx-card-header {
+  border-bottom: 1.5px solid var(--color-border-subtle);
+  padding-bottom: 12px;
+  margin-bottom: 4px;
+}
+
+.rx-card-date {
+  margin: 0;
+  font-size: 1.15rem;
+  color: var(--navy-primary);
+}
+
+.rx-card-meta {
+  margin: 4px 0 0;
+  font-size: 1rem;
+  color: var(--color-text-secondary);
+}
+
+.rx-med-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  counter-reset: med;
+}
+
+.rx-med {
+  counter-increment: med;
+  padding: 14px 0;
+  border-bottom: 1.5px solid var(--color-border-subtle);
+}
+
+.rx-med:last-child {
+  border-bottom: none;
+}
+
+.rx-med-name {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+/* Shows "1." "2." before each medicine name */
+.rx-med-name::before {
+  content: counter(med) ". ";
+}
+
+.rx-med-numbers {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.rx-num {
+  display: flex;
+  flex-direction: column;
+  background: var(--navy-subtle);
+  border-radius: 10px;
+  padding: 8px 10px;
+}
+
+.rx-num-label {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+}
+
+.rx-num-value {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--navy-dark);
+}
+
+.rx-med-note {
+  margin: 8px 0 0;
+  font-size: 0.95rem;
+  color: var(--color-text-secondary);
+}
+
+/* ===== Prescription photo buttons ===== */
+.rx-card-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.rx-btn {
+  flex: 1;
+  min-height: 48px;          /* big tap target for seniors */
+  padding: 10px 16px;
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--navy-primary);
+  background: var(--color-surface);
+  border: 1.5px solid var(--navy-primary);
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.rx-btn:hover {
+  background: var(--navy-subtle);
+}
+
+.rx-btn:focus-visible {
+  outline: 3px solid var(--navy-light);
+  outline-offset: 2px;
+}
+
+/* ===== Photo pop-up ===== */
+.rx-photo-dialog {
+  width: min(92vw, 520px);
+  border: none;
+  border-radius: 14px;
+  padding: 18px 20px;
+}
+
+.rx-photo-dialog::backdrop {
+  background: rgba(10, 17, 56, 0.6);
+}
+
+.rx-photo-title {
+  margin: 0 0 12px;
+  font-size: 1.1rem;
+  color: var(--navy-primary);
+}
+
+.rx-photo-img {
+  display: block;
+  width: 100%;
+  max-height: 65vh;
+  object-fit: contain;
+  border-radius: 8px;
+  margin-bottom: 14px;
+}
+
+.rx-photo-dialog .rx-btn {
+  width: 100%;
+}
+
+/* ===== Scrollable table (staff prescriptions) ===== */
+.table-container--scroll {
+  max-height: 520px;   /* about 10 rows tall */
+  overflow-y: auto;    /* scroll inside the box for more */
+}
+
+/* Keep the column titles visible while scrolling */
+.table-container--scroll thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--color-surface);
+}
+
+/* ===== Staff form: medicine rows ===== */
+.rx-meds-fieldset {
+  border: 1.5px solid var(--color-border);
+  border-radius: 14px;
+  padding: 16px;
+  margin: 16px 0;
+}
+
+.rx-meds-fieldset legend {
+  padding: 0 8px;
+  font-weight: 600;
+  color: var(--navy-primary);
+}
+
+/* Phone: 2 fields per line */
+.rx-med-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  padding: 14px 0;
+  border-bottom: 1.5px dashed var(--color-border);
+}
+
+/* Medicine name, note and remove button use the full width */
+.rx-med-row .rx-med-name-field,
+.rx-med-row .rx-med-note-field,
+.rx-med-row .rx-remove-med-btn {
+  grid-column: 1 / -1;
+}
+
+/* Computer: name, dose, unit, times a day, days on one line */
+@media (min-width: 900px) {
+  .rx-med-row {
+    grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+  }
+  .rx-med-row .rx-med-name-field {
+    grid-column: auto;
+  }
+}
+
+.rx-remove-med-btn {
+  justify-self: start;
+  color: var(--red-dark);
+  border-color: var(--red-dark);
+}
+
+.rx-add-med-btn {
+  margin-top: 12px;
 }
