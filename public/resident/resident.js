@@ -186,6 +186,18 @@ function formatTime12(hhmm) {
   return `${h % 12 || 12}:${String(m).padStart(2, '0')} ${suffix}`;
 }
 
+// How many upcoming events residents see
+const MAX_EVENTS_SHOWN = 3;
+
+// Returns "Today", "Tonight" (6 PM or later), "Tomorrow", or "" (no badge)
+function getWhenLabel(ev, today) {
+  if (ev.date === today) return ev.startTime >= '18:00' ? 'Tonight' : 'Today';
+  const t = new Date();
+  t.setDate(t.getDate() + 1);
+  const tomorrow = `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, '0')}-${String(t.getDate()).padStart(2, '0')}`;
+  return ev.date === tomorrow ? 'Tomorrow' : '';
+}
+
 function renderSchedule() {
   const list = document.getElementById('events-list');
   const emptyEl = document.getElementById('events-empty');
@@ -193,7 +205,7 @@ function renderSchedule() {
 
   const now = new Date();
   const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-  const events = EventStore.getUpcoming(today);
+  const events = EventStore.getUpcoming(today).slice(0, MAX_EVENTS_SHOWN);
   list.innerHTML = '';
   if (emptyEl) emptyEl.hidden = events.length > 0;
 
@@ -211,6 +223,8 @@ function renderSchedule() {
     card.appendChild(badge);
 
     const body = makeEl('div', 'event-card-body');
+    const whenLabel = getWhenLabel(ev, today);
+    if (whenLabel) body.appendChild(makeEl('span', 'event-when', whenLabel));
     body.appendChild(makeEl('h3', 'event-title', ev.title));
     if (ev.audience) body.appendChild(makeEl('p', 'event-audience', `For: ${ev.audience}`));
     const fullDate = dateObj.toLocaleDateString('en-PH', { weekday: 'long', month: 'long', day: 'numeric' });
