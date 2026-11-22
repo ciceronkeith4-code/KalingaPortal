@@ -6,7 +6,9 @@ function renderDashboardStats() {
 
   if (totalEl) totalEl.textContent = patients.length;
   if (archivedEl) archivedEl.textContent = patients.filter((p) => p.archived).length;
-  if (apptEl) apptEl.textContent = PatientStore.getAllSchedule().length;
+  const now = new Date();
+  const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  if (apptEl) apptEl.textContent = EventStore.getUpcoming(todayStr).length;
 }
 
 function statusPill(text, className) {

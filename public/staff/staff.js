@@ -7,8 +7,7 @@ function statusPill(text, className) {
 
 function renderDashboardStats() {
   const patients = PatientStore.getAll();
-  const allRx = PatientStore.getAllPrescriptions();
-  const allSchedule = PatientStore.getAllSchedule();
+  const allRx = PatientStore.getAllPrescriptions(); 
 
   const activeEl = document.getElementById('stat-active-patients');
   const pendingRxEl = document.getElementById('stat-pending-rx');
@@ -20,7 +19,7 @@ function renderDashboardStats() {
   const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
   if (pendingRxEl) pendingRxEl.textContent = allRx.filter((rx) => rx.dateGiven === todayStr).length;
   if (archivedEl) archivedEl.textContent = patients.filter((p) => p.archived).length;
-  if (apptEl) apptEl.textContent = allSchedule.length;
+  if (apptEl) apptEl.textContent = EventStore.getUpcoming(todayStr).length;
 }
 
 let patientsActiveTab = 'active';
