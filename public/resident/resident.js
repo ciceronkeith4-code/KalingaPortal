@@ -15,7 +15,9 @@ function renderDashboardStats() {
   const rxEl = document.getElementById('stat-my-prescriptions');
   const apptEl = document.getElementById('stat-upcoming-appointments');
   if (rxEl) rxEl.textContent = patient ? patient.prescriptions.length : 0;
-  if (apptEl) apptEl.textContent = patient ? patient.schedule.length : 0;
+  const now = new Date();
+  const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  if (apptEl) apptEl.textContent = EventStore.getUpcoming(todayStr).length;
 }
 
 // Small helper: create an element with a class and (safe) text
