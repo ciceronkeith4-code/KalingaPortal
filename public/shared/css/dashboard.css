@@ -1375,42 +1375,42 @@ body {
   text-align: center;
 }
 
-/* ---------- Admin Schedule Table Column Specifications ----------
-   Patient: 25% (Left), Date: 16% (Center), Time: 14% (Center), Reason: 30% (Left), Status: 15% (Center)
+/* ---------- Admin Events Table Column Specifications ----------
+   Date: 14% (Center), Time: 20% (Center), Event: 28% (Left), Location: 22% (Left), Who should attend: 16% (Left)
    ----------------------------------------------------------------- */
-.data-table--schedule col.col-patient,
-.data-table--schedule th.col-patient,
-.data-table--schedule td.col-patient {
-  width: 25%;
-  text-align: left;
-}
-
-.data-table--schedule col.col-date,
+.data-table--schedule col.col-date, 
 .data-table--schedule th.col-date,
 .data-table--schedule td.col-date {
-  width: 16%;
+  width: 14%;
   text-align: center;
 }
 
 .data-table--schedule col.col-time,
 .data-table--schedule th.col-time,
 .data-table--schedule td.col-time {
-  width: 14%;
+  width: 20%;
   text-align: center;
 }
 
 .data-table--schedule col.col-reason,
 .data-table--schedule th.col-reason,
 .data-table--schedule td.col-reason {
-  width: 30%;
+  width: 28%;
   text-align: left;
 }
 
-.data-table--schedule col.col-status,
-.data-table--schedule th.col-status,
-.data-table--schedule td.col-status {
-  width: 15%;
-  text-align: center;
+.data-table--schedule col.col-location,
+.data-table--schedule th.col-location,
+.data-table--schedule td.col-location {
+  width: 22%;
+  text-align: left;
+}
+
+.data-table--schedule col.col-audience,
+.data-table--schedule th.col-audience,
+.data-table--schedule td.col-audience {
+  width: 16%;
+  text-align: left;
 }
 
 /* ---------- Staff Dashboard Tables Column Specifications ---------- */
