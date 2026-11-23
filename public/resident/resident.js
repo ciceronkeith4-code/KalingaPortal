@@ -131,6 +131,24 @@ function formatRxMonth(isoDate) {
   return new Date(y, m - 1, 1).toLocaleDateString('en-PH', { month: 'long', year: 'numeric' }).toUpperCase();
 }
 
+// Saves the prescription photo to the resident's device (after a privacy warning)
+async function downloadRxPhoto(rx) {
+  const message = 'Your prescription will be saved on this phone or computer. Anyone who uses this device can see it.';
+  const ok = typeof confirmDialog === 'function'
+    ? await confirmDialog({ title: 'Save to this device?', message, confirmLabel: 'Yes, download' })
+    : window.confirm(`Save to this device?\n\n${message}`);
+  if (!ok) return;
+
+  const link = document.createElement('a');
+  link.href = rx.photo;
+  const ext = rx.photo.split('.').pop().split('?')[0] || 'jpg';
+  link.download = `prescription-${rx.dateGiven}.${ext}`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  showToast('Prescription downloaded.');
+}
+
 // Builds one full prescription card (same design as before)
 function buildRxCard(rx, isLatest) {
   const card = makeEl('article', 'rx-card');
@@ -168,7 +186,10 @@ function buildRxCard(rx, isLatest) {
     const printBtn = makeEl('button', 'rx-btn', 'Print photo');
     printBtn.type = 'button';
     printBtn.addEventListener('click', () => printRxPhoto(rx));
-    actions.append(viewBtn, printBtn);
+    const downloadBtn = makeEl('button', 'rx-btn', 'Download');
+    downloadBtn.type = 'button';
+    downloadBtn.addEventListener('click', () => downloadRxPhoto(rx));
+    actions.append(viewBtn, printBtn, downloadBtn);
     card.appendChild(actions);
   }
   return card;
