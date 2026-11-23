@@ -121,6 +121,88 @@ function printRxPhoto(rx) {
   img.src = new URL(rx.photo, window.location.href).href;
 }
 
+// How many older prescriptions to show at a time
+const OLDER_PAGE_SIZE = 5;
+let olderShownCount = OLDER_PAGE_SIZE;
+
+// "2026-11-20" -> "NOVEMBER 2026"
+function formatRxMonth(isoDate) {
+  const [y, m] = isoDate.split('-').map(Number);
+  return new Date(y, m - 1, 1).toLocaleDateString('en-PH', { month: 'long', year: 'numeric' }).toUpperCase();
+}
+
+// Builds one full prescription card (same design as before)
+function buildRxCard(rx, isLatest) {
+  const card = makeEl('article', 'rx-card');
+
+  const header = makeEl('div', 'rx-card-header');
+  const top = makeEl('div', 'rx-card-top');
+  top.appendChild(makeEl('h3', 'rx-card-date', formatRxDate(rx.dateGiven)));
+  if (isLatest) top.appendChild(makeEl('span', 'rx-latest-tag', 'Latest'));
+  header.appendChild(top);
+  header.appendChild(makeEl('p', 'rx-card-meta', `Prescribed by ${rx.doctorName}`));
+  const eventName = getEventName(rx.eventId);
+  if (eventName) header.appendChild(makeEl('p', 'rx-card-meta', `From event: ${eventName}`));
+  card.appendChild(header);
+
+  const medList = makeEl('ol', 'rx-med-list');
+  rx.medicines.forEach((med) => {
+    const item = makeEl('li', 'rx-med');
+    item.appendChild(makeEl('p', 'rx-med-name', med.name));
+    const nums = makeEl('div', 'rx-med-numbers');
+    nums.appendChild(makeNumBox('Dose', `${med.dose} ${med.unit}`));
+    nums.appendChild(makeNumBox('Times a day', `${med.timesPerDay}x`));
+    nums.appendChild(makeNumBox('For how long', `${med.days} days`));
+    item.appendChild(nums);
+    if (med.note) item.appendChild(makeEl('p', 'rx-med-note', med.note));
+    medList.appendChild(item);
+  });
+  card.appendChild(medList);
+
+  // Only show photo buttons if this prescription has a photo
+  if (rx.photo) {
+    const actions = makeEl('div', 'rx-card-actions');
+    const viewBtn = makeEl('button', 'rx-btn', 'View photo');
+    viewBtn.type = 'button';
+    viewBtn.addEventListener('click', () => openRxPhoto(rx));
+    const printBtn = makeEl('button', 'rx-btn', 'Print photo');
+    printBtn.type = 'button';
+    printBtn.addEventListener('click', () => printRxPhoto(rx));
+    actions.append(viewBtn, printBtn);
+    card.appendChild(actions);
+  }
+  return card;
+}
+
+// One short row for an older prescription; tapping it opens the full card
+function buildRxRow(rx, index) {
+  const wrap = makeEl('div', 'rx-row-wrap');
+  const panelId = `rx-panel-${index}`;
+
+  const row = makeEl('button', 'rx-row');
+  row.type = 'button';
+  row.setAttribute('aria-expanded', 'false');
+  row.setAttribute('aria-controls', panelId);
+  row.appendChild(makeEl('span', 'rx-row-date', formatRxDate(rx.dateGiven)));
+  row.appendChild(makeEl('span', 'rx-row-names', rx.medicines.map((m) => m.name).join(', ')));
+  const count = rx.medicines.length;
+  row.appendChild(makeEl('span', 'rx-row-count', `${count} ${count === 1 ? 'medicine' : 'medicines'}`));
+
+  const panel = makeEl('div', 'rx-row-panel');
+  panel.id = panelId;
+  panel.hidden = true;
+  panel.appendChild(buildRxCard(rx, false));
+
+  row.addEventListener('click', () => {
+    const willOpen = panel.hidden;
+    panel.hidden = !willOpen;
+    row.setAttribute('aria-expanded', String(willOpen));
+  });
+
+  wrap.append(row, panel);
+  return wrap;
+}
+
 function renderPrescriptions() {
   const list = document.getElementById('prescriptions-list');
   const emptyEl = document.getElementById('prescriptions-empty');
@@ -139,45 +221,31 @@ function renderPrescriptions() {
   }
   if (emptyEl) emptyEl.hidden = true;
 
-  entries.forEach((rx) => {
-    const card = makeEl('article', 'rx-card');
+  // 1. Latest prescription, fully open
+  list.appendChild(buildRxCard(entries[0], true));
 
-    const header = makeEl('div', 'rx-card-header');
-    header.appendChild(makeEl('h3', 'rx-card-date', formatRxDate(rx.dateGiven)));
-    header.appendChild(makeEl('p', 'rx-card-meta', `Prescribed by ${rx.doctorName}`));
-    const eventName = getEventName(rx.eventId);
-    if (eventName) header.appendChild(makeEl('p', 'rx-card-meta', `From event: ${eventName}`));
-    card.appendChild(header);
-
-    const medList = makeEl('ol', 'rx-med-list');
-    rx.medicines.forEach((med) => {
-      const item = makeEl('li', 'rx-med');
-      item.appendChild(makeEl('p', 'rx-med-name', med.name));
-      const nums = makeEl('div', 'rx-med-numbers');
-      nums.appendChild(makeNumBox('Dose', `${med.dose} ${med.unit}`));
-      nums.appendChild(makeNumBox('Times a day', `${med.timesPerDay}x`));
-      nums.appendChild(makeNumBox('For how long', `${med.days} days`));
-      item.appendChild(nums);
-      if (med.note) item.appendChild(makeEl('p', 'rx-med-note', med.note));
-      medList.appendChild(item);
-    });
-    card.appendChild(medList);
-
-        // Only show photo buttons if this prescription has a photo
-    if (rx.photo) {
-      const actions = makeEl('div', 'rx-card-actions');
-      const viewBtn = makeEl('button', 'rx-btn', 'View photo');
-      viewBtn.type = 'button';
-      viewBtn.addEventListener('click', () => openRxPhoto(rx));
-      actions.appendChild(viewBtn);
-            const printBtn = makeEl('button', 'rx-btn', 'Print photo');
-      printBtn.type = 'button';
-      printBtn.addEventListener('click', () => printRxPhoto(rx));
-      actions.appendChild(printBtn);
-      card.appendChild(actions);
+  // 2. Older prescriptions as short rows, grouped by month
+  const older = entries.slice(1);
+  let lastMonth = '';
+  older.slice(0, olderShownCount).forEach((rx, i) => {
+    const month = formatRxMonth(rx.dateGiven);
+    if (month !== lastMonth) {
+      list.appendChild(makeEl('h3', 'rx-month-heading', month));
+      lastMonth = month;
     }
-    list.appendChild(card);
+    list.appendChild(buildRxRow(rx, i));
   });
+
+  // 3. "Show older prescriptions" if there are more
+  if (older.length > olderShownCount) {
+    const moreBtn = makeEl('button', 'rx-btn rx-more-btn', 'Show older prescriptions');
+    moreBtn.type = 'button';
+    moreBtn.addEventListener('click', () => {
+      olderShownCount += OLDER_PAGE_SIZE;
+      renderPrescriptions();
+    });
+    list.appendChild(moreBtn);
+  }
 }
 
 // "13:30" -> "1:30 PM"
