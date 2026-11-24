@@ -70,6 +70,20 @@ const PatientStore = {
     return loadPatients().find((p) => p.username === username) || null;
   },
 
+  // Staff/Admin only: personal, medical and emergency details shown on My Details.
+  // details = { birthdate, sex, civilStatus, contactNumber, bloodType, heightCm, weightKg,
+  //             allergies: [], conditions: [], maintenanceMeds: [],
+  //             emergencyContact: { name, relationship, contactNumber, address, sameAsResident },
+  //             photo }
+  updateDetails(id, details) {
+    const patients = loadPatients();
+    const patient = patients.find((p) => p.id === id);
+    if (!patient) return { ok: false, error: 'Patient not found.' };
+    patient.details = { ...(patient.details || {}), ...details };
+    savePatients(patients);
+    return { ok: true };
+  },
+  
   create({ username, password, name, age, address }) {
     const patients = loadPatients();
     const cleanUsername = (username || '').trim();
@@ -343,3 +357,15 @@ const EventStore = {
 };
 
 window.EventStore = EventStore;
+
+// Age in years from a birthdate like "1992-03-12" (updates automatically every birthday)
+function calcAge(birthdate) {
+  if (!birthdate) return null;
+  const [y, m, d] = birthdate.split('-').map(Number);
+  const today = new Date();
+  let age = today.getFullYear() - y;
+  // Not yet had this year's birthday? Then one year less.
+  if (today.getMonth() + 1 < m || (today.getMonth() + 1 === m && today.getDate() < d)) age -= 1;
+  return age;
+}
+window.calcAge = calcAge;

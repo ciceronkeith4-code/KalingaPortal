@@ -335,16 +335,107 @@ function renderSchedule() {
   }
 }
 
+// "1992-03-12" -> "March 12, 1992"
+function formatLongDate(isoDate) {
+  const [y, m, d] = isoDate.split('-').map(Number);
+  return new Date(y, m - 1, d).toLocaleDateString('en-PH', { month: 'long', day: 'numeric', year: 'numeric' });
+}
+
+// One label + value pair; shows "Not recorded" when empty
+function makeField(label, value, fullWidth) {
+  const field = makeEl('div', 'details-field' + (fullWidth ? ' details-field--full' : ''));
+  field.appendChild(makeEl('p', 'details-label', label));
+  field.appendChild(makeEl('p', 'details-value' + (value ? '' : ' details-value--empty'), value || 'Not recorded'));
+  return field;
+}
+
+// A label with a list of chips, e.g. Allergies: [Penicillin] [Shrimp]
+function makeChipField(label, items, isAlert) {
+  const field = makeEl('div', 'details-field details-field--full');
+  field.appendChild(makeEl('p', 'details-label', label));
+  if (!items || items.length === 0) {
+    field.appendChild(makeEl('p', 'details-value details-value--empty', 'None recorded'));
+    return field;
+  }
+  const chips = makeEl('ul', 'details-chips');
+  items.forEach((item) => {
+    chips.appendChild(makeEl('li', 'details-chip' + (isAlert ? ' details-chip--alert' : ''), item));
+  });
+  field.appendChild(chips);
+  return field;
+}
+
+// A titled card with a grid of fields inside
+function makeDetailsCard(title, fields) {
+  const card = makeEl('section', 'details-card');
+  card.appendChild(makeEl('h3', 'details-card-title', title));
+  const grid = makeEl('div', 'details-grid');
+  fields.forEach((f) => grid.appendChild(f));
+  card.appendChild(grid);
+  return card;
+}
+
 function renderDetails() {
+  const container = document.getElementById('my-details');
+  if (!container) return;
   const patient = getMyPatient();
-  const nameEl = document.getElementById('details-name');
-  const ageEl = document.getElementById('details-age');
-  const addressEl = document.getElementById('details-address');
-  const usernameEl = document.getElementById('details-username');
-  if (nameEl) nameEl.textContent = patient && patient.name ? patient.name : '-';
-  if (ageEl) ageEl.textContent = patient && patient.age ? patient.age : '-';
-  if (addressEl) addressEl.textContent = patient && patient.address ? patient.address : '-';
-  if (usernameEl) usernameEl.textContent = patient ? patient.username : '-';
+  container.innerHTML = '';
+  if (!patient) return;
+  const d = patient.details || {};
+  const ec = d.emergencyContact || {};
+
+  // 1. Header: photo (or initials), name, age and sex
+  const header = makeEl('section', 'details-card details-header');
+  if (d.photo) {
+    const img = makeEl('img', 'details-photo');
+    img.src = d.photo;
+    img.alt = `Photo of ${patient.name || patient.username}`;
+    header.appendChild(img);
+  } else {
+    const initials = (patient.name || patient.username)
+      .split(' ').filter(Boolean).slice(0, 2)
+      .map((word) => word[0].toUpperCase()).join('');
+    const avatar = makeEl('div', 'details-photo details-photo--initials', initials);
+    avatar.setAttribute('aria-hidden', 'true');
+    header.appendChild(avatar);
+  }
+  const info = makeEl('div', 'details-header-info');
+  info.appendChild(makeEl('p', 'details-name', patient.name || patient.username));
+  const age = calcAge(d.birthdate);
+  const ageText = age !== null ? `${age} years old` : 'Age not recorded';
+  info.appendChild(makeEl('p', 'details-sub', d.sex ? `${ageText} · ${d.sex}` : ageText));
+  info.appendChild(makeEl('p', 'details-sub', `Username: ${patient.username}`));
+  header.appendChild(info);
+  container.appendChild(header);
+
+  // 2. Personal information
+  container.appendChild(makeDetailsCard('Personal information', [
+    makeField('Birthdate', d.birthdate ? formatLongDate(d.birthdate) : ''),
+    makeField('Civil status', d.civilStatus),
+    makeField('Home address', patient.address, true),
+    makeField('Contact number', d.contactNumber, true)
+  ]));
+
+  // 3. Medical information
+  const heightWeight = (d.heightCm || d.weightKg)
+    ? `${d.heightCm ? d.heightCm + ' cm' : '-'} / ${d.weightKg ? d.weightKg + ' kg' : '-'}`
+    : '';
+  container.appendChild(makeDetailsCard('Medical information', [
+    makeField('Blood type', d.bloodType),
+    makeField('Height / Weight', heightWeight),
+    makeChipField('Allergies', d.allergies, true),
+    makeChipField('Existing conditions', d.conditions),
+    makeChipField('Maintenance medicines', d.maintenanceMeds)
+  ]));
+
+  // 4. Emergency contact
+  const ecAddress = ec.sameAsResident ? "Same as resident's address" : ec.address;
+  container.appendChild(makeDetailsCard('Emergency contact', [
+    makeField('Name', ec.name),
+    makeField('Relationship', ec.relationship),
+    makeField('Contact number', ec.contactNumber),
+    makeField('Address', ecAddress, true)
+  ]));
 }
 
 document.addEventListener('DOMContentLoaded', () => {

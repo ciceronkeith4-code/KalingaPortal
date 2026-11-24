@@ -4379,3 +4379,143 @@ body {
   flex: none;
   width: 100%;
 }
+
+/* ===== Resident My Details ===== */
+#my-details {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.details-card {
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-border);
+  border-radius: 14px;
+  padding: 18px 20px;
+}
+
+/* Header: photo + name + age */
+.details-header {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.details-photo {
+  width: 88px;
+  height: 88px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.details-photo--initials {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--navy-subtle);
+  color: var(--navy-primary);
+  font-size: 1.9rem;
+  font-weight: 700;
+}
+
+.details-header-info {
+  min-width: 0;
+}
+
+.details-name {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.details-sub {
+  margin: 3px 0 0;
+  font-size: 1rem;
+  color: var(--color-text-secondary);
+}
+
+.details-card-title {
+  margin: 0 0 14px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+/* Fields: 1 column on phones, 2 on wider screens */
+.details-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px 20px;
+}
+
+@media (min-width: 600px) {
+  .details-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .details-field--full {
+    grid-column: 1 / -1;
+  }
+}
+
+.details-label {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+}
+
+.details-value {
+  margin: 3px 0 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.details-value--empty {
+  font-weight: 400;
+  font-style: italic;
+  color: var(--color-text-secondary);
+}
+
+/* Chips for allergies, conditions, medicines */
+.details-chips {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 6px 0 0;
+  padding: 0;
+}
+
+.details-chip {
+  padding: 5px 12px;
+  border-radius: var(--radius-pill);
+  background: var(--navy-subtle);
+  color: var(--navy-dark);
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+/* Allergies: red, with a warning sign */
+.details-chip--alert {
+  background: #FDECEC;
+  color: var(--red-dark);
+  border: 1.5px solid var(--red-primary);
+}
+
+.details-chip--alert::before {
+  content: "⚠ ";
+}
+
+.details-note {
+  margin: 16px 0 0;
+  padding: 12px 16px;
+  border-radius: 10px;
+  background: var(--navy-subtle);
+  color: var(--navy-dark);
+  font-size: 0.95rem;
+}
