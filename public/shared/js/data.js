@@ -5,16 +5,16 @@
 
 const PATIENTS_KEY = 'kalinga_patients';
 
-// Usernames reserved for the fixed admin/staff logins (see script.js STATIC_ACCOUNTS).
-// Kept in sync manually since this file loads on pages that don't load script.js.
-const RESERVED_USERNAMES = ['admin.kalinga', 'staff.kalinga'];
+// Usernames reserved for the fixed admin/staff logins (see login.js STATIC_ACCOUNTS).
+// Kept in sync manually since this file loads on pages that don't load login.js.
+const RESERVED_USERNAMES = ['admin.linkod', 'staff.linkod'];
 
 const DEFAULT_PATIENTS = [
   {
     id: 'p-seed-1',
-    username: 'user.kalinga',
-    password: 'kalinga123',
-    name: 'Resident Kalinga',
+    username: 'user.linkod',
+    password: 'linkod123',
+    name: 'Resident LINKod',
     age: '',
     address: '',
     archived: false,
@@ -39,7 +39,18 @@ function loadPatients() {
       return clone(DEFAULT_PATIENTS);
     }
     const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : clone(DEFAULT_PATIENTS);
+    if (!Array.isArray(parsed)) return clone(DEFAULT_PATIENTS);
+    // Migrate legacy default seed credentials in existing browser localStorage.
+    let migrated = false;
+    const seed = parsed.find((p) => p && p.id === 'p-seed-1');
+    if (seed && seed.username === 'user.kalinga') {
+      seed.username = 'user.linkod';
+      if (seed.password === 'kalinga123') seed.password = 'linkod123';
+      if (seed.name === 'Resident Kalinga') seed.name = 'Resident LINKod';
+      migrated = true;
+    }
+    if (migrated) savePatients(parsed);
+    return parsed;
   } catch (e) {
     return clone(DEFAULT_PATIENTS);
   }
@@ -146,6 +157,16 @@ const PatientStore = {
     patient.archived = archived;
     savePatients(patients);
     return { ok: true, patient };
+  },
+
+  acceptPrivacy(id) {
+    const patients = loadPatients();
+    const patient = patients.find((p) => p.id === id);
+    if (!patient) return { ok: false, error: 'Patient not found.' };
+    patient.privacyAccepted = true;
+    patient.privacyAcceptedAt = new Date().toISOString();
+    savePatients(patients);
+    return { ok: true };
   },
 
   // Resident: request a prescription.

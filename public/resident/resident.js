@@ -107,7 +107,7 @@ function printRxPhoto(rx) {
   img.alt = `Signed prescription from ${rx.doctorName}`;
 
   const foot = makeEl('div', 'foot');
-  foot.appendChild(makeEl('span', '', `Printed from Alaga Portal on ${new Date().toLocaleDateString('en-PH', { month: 'short', day: 'numeric', year: 'numeric' })}`));
+  foot.appendChild(makeEl('span', '', `Printed from LINKod Portal on ${new Date().toLocaleDateString('en-PH', { month: 'short', day: 'numeric', year: 'numeric' })}`));
   foot.appendChild(makeEl('span', '', `Ref no. ${rx.id}`));
 
   doc.body.append(head, img, foot);
@@ -412,8 +412,8 @@ function renderDetails() {
   container.appendChild(makeDetailsCard('Personal information', [
     makeField('Birthdate', d.birthdate ? formatLongDate(d.birthdate) : ''),
     makeField('Civil status', d.civilStatus),
-    makeField('Home address', patient.address, true),
-    makeField('Contact number', d.contactNumber, true)
+    makeField('Contact number', d.contactNumber),
+    makeField('Home address', patient.address)
   ]));
 
   // 3. Medical information
@@ -434,8 +434,61 @@ function renderDetails() {
     makeField('Name', ec.name),
     makeField('Relationship', ec.relationship),
     makeField('Contact number', ec.contactNumber),
-    makeField('Address', ecAddress, true)
+    makeField('Address', ecAddress)
   ]));
+}
+
+function initPrivacyConsent() {
+  const dialog = document.getElementById('privacy-consent-dialog');
+  const checkbox = document.getElementById('privacy-consent-checkbox');
+  const acceptBtn = document.getElementById('privacy-accept-btn');
+  const declineBtn = document.getElementById('privacy-decline-btn');
+  if (!dialog || !checkbox || !acceptBtn || !declineBtn) return;
+
+  const patient = getMyPatient();
+  const username = ((session && session.username) || (patient && patient.username) || '').toLowerCase();
+  const isBetaTester = username === 'user.linkod';
+
+  // Beta test user (user.linkod) always sees the Data Privacy Act notice on load;
+  // other residents see it until they have accepted once.
+  if (!isBetaTester && patient && patient.privacyAccepted) {
+    document.documentElement.classList.remove('privacy-gate-pending');
+    return;
+  }
+
+  document.documentElement.classList.add('privacy-gate-pending');
+  checkbox.checked = false;
+  acceptBtn.disabled = true;
+
+  checkbox.addEventListener('change', () => {
+    acceptBtn.disabled = !checkbox.checked;
+  });
+
+  // Require explicit checkbox acceptance; block Esc/cancel dismissal.
+  dialog.addEventListener('cancel', (e) => {
+    e.preventDefault();
+  });
+
+  acceptBtn.addEventListener('click', () => {
+    if (!checkbox.checked) return;
+    if (!isBetaTester && patient && typeof PatientStore !== 'undefined' && PatientStore.acceptPrivacy) {
+      PatientStore.acceptPrivacy(patient.id);
+    }
+    document.documentElement.classList.remove('privacy-gate-pending');
+    dialog.close();
+    if (typeof showToast === 'function') {
+      showToast('Data Privacy Notice accepted.');
+    }
+  });
+
+  declineBtn.addEventListener('click', () => {
+    if (typeof clearSession === 'function') clearSession();
+    window.location.href = '/index.html';
+  });
+
+  if (typeof dialog.showModal === 'function') {
+    dialog.showModal();
+  }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -443,6 +496,7 @@ document.addEventListener('DOMContentLoaded', () => {
   renderPrescriptions();
   renderSchedule();
   renderDetails();
+  initPrivacyConsent();
 
   if (typeof KalingaCalendar !== 'undefined') {
     KalingaCalendar.init({

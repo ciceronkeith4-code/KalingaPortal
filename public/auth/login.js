@@ -1,6 +1,6 @@
 const STATIC_ACCOUNTS = {
-  'admin.kalinga': { password: 'kalingaadmin', role: 'admin', name: 'Admin Kalinga' },
-  'staff.kalinga': { password: 'kalingastaff123', role: 'staff', name: 'Staff Kalinga' }
+  'admin.linkod': { password: 'linkodadmin', role: 'admin', name: 'Admin LINKod' },
+  'staff.linkod': { password: 'linkodstaff123', role: 'staff', name: 'Staff LINKod' }
 };
 
 const SESSION_KEY = 'kalinga_session';

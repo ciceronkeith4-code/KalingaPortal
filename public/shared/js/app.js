@@ -648,7 +648,7 @@ function showPrescriptionDetailsModal(rx, role, onUpdate) {
 
   const sub = document.createElement('p');
   sub.className = 'appt-modal-sub';
-  sub.textContent = 'Barangay 603 Health Center Dispensary';
+  sub.textContent = 'Barangay 386 Health Center Dispensary';
 
   titleGroup.appendChild(title);
   titleGroup.appendChild(sub);
@@ -798,7 +798,7 @@ function printPrescriptionSlip(rx) {
     </head>
     <body>
       <div class="header">
-        <h1>Barangay 603 Health Center</h1>
+        <h1>Barangay 386 Health Center</h1>
         <p>Metro Manila · Dispensary & Medical Care Services</p>
       </div>
       <div class="info-row">
@@ -811,7 +811,7 @@ function printPrescriptionSlip(rx) {
         <div class="notes"><strong>Instructions:</strong> ${rx.notes || 'Take as directed by health officer.'}</div>
       </div>
       <div class="footer">
-        <div>Official Barangay 603 Medical Record Slip</div>
+        <div>Official Barangay 386 Medical Record Slip</div>
         <div class="sig-line">Attending Health Staff / Officer</div>
       </div>
       <script>window.onload = function() { window.print(); };</script>
@@ -851,8 +851,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const profileUsername = document.getElementById('profile-username');
     const profileRole = document.getElementById('profile-role');
+    const profileDisplayName = document.getElementById('profile-display-name');
+    const profileHandle = document.getElementById('profile-handle');
+    const profileAvatar = document.getElementById('profile-avatar');
     if (profileUsername) profileUsername.textContent = session.username;
     if (profileRole) profileRole.textContent = roleLabel;
+    if (profileDisplayName) profileDisplayName.textContent = session.name || session.username;
+    if (profileHandle) profileHandle.textContent = `@${session.username}`;
+    if (profileAvatar) profileAvatar.textContent = initials(session.name || session.username);
   }
 
   // Clock

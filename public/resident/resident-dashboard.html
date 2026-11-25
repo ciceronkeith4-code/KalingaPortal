@@ -11,14 +11,40 @@
 <link rel="shortcut icon" href="/favicon.ico">
 <link rel="apple-touch-icon" href="/assets/favicon.png">
 <link rel="stylesheet" href="/shared/css/dashboard.css">
+<script>
+  (function () {
+    try {
+      var s = JSON.parse(sessionStorage.getItem('kalinga_session') || 'null');
+      if (!s || s.role !== 'resident') return;
+      var isBeta = (s.username || '').toLowerCase() === 'user.linkod';
+      if (isBeta) {
+        document.documentElement.classList.add('privacy-gate-pending');
+        return;
+      }
+      var patients = JSON.parse(localStorage.getItem('kalinga_patients') || '[]');
+      var me = Array.isArray(patients)
+        ? patients.find(function (p) { return p && (p.id === s.patientId || p.username === s.username); })
+        : null;
+      if (!me || !me.privacyAccepted) {
+        document.documentElement.classList.add('privacy-gate-pending');
+      }
+    } catch (e) {
+      document.documentElement.classList.add('privacy-gate-pending');
+    }
+  })();
+</script>
 </head>
 <body>
 <div class="app">
 
   <header class="topbar">
     <div class="topbar-left">
-      <div class="topbar-brand-mobile" aria-hidden="true">
-        <img src="/assets/kalinga-logo.png" alt="Barangay 603" class="brand-logo-mobile">
+      <div class="topbar-brand-mobile">
+        <img src="/assets/kalinga-logo.png" alt="" class="brand-logo-mobile">
+        <div class="brand-text">
+          <p class="brand-title">Barangay 386</p>
+          <p class="brand-sub">Metro Manila</p>
+        </div>
       </div>
       <div class="portal-info">
         <p class="portal-title">Barangay Health Portal</p>
@@ -27,7 +53,7 @@
     </div>
 
     <div class="topbar-right">
-      <button class="icon-btn" id="notif-btn" aria-expanded="false">
+      <button class="icon-btn" id="notif-btn" aria-label="Notifications" aria-expanded="false">
         <span class="notif-dot"></span>
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
@@ -90,10 +116,10 @@
 
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
-      <div class="brand" title="Barangay 603 Metro Manila">
-        <img src="/assets/kalinga-logo.png" alt="Barangay 603 Kalinga Logo" class="brand-logo">
+      <div class="brand" title="Barangay 386 Metro Manila">
+        <img src="/assets/kalinga-logo.png" alt="Barangay 386 LINKod Logo" class="brand-logo">
         <div class="brand-text">
-          <p class="brand-title">Barangay 603</p>
+          <p class="brand-title">Barangay 386</p>
           <p class="brand-sub">Metro Manila</p>
         </div>
       </div>
@@ -276,7 +302,14 @@
         <h2>My Details</h2>
         <p class="section-sub">Your information on file at the barangay health center.</p>
         <div id="my-details"></div>
-        <p class="details-note">Only the health center staff can change your details. If something is wrong, please visit the barangay health center.</p>
+        <p class="details-note">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+          </svg>
+          <span>Only the health center staff can change your details. If something is wrong, please visit the barangay health center.</span>
+        </p>
       </div>
     </section>
 
@@ -284,7 +317,7 @@
       <div class="minimal-guide">
         <div class="guide-hero-minimal">
           <h2>Resident & Patient Portal Guide</h2>
-          <p>A simple guide to accessing your Barangay 603 healthcare services: viewing your prescriptions, viewing upcoming health events, and reviewing your health records.</p>
+          <p>A simple guide to accessing your Barangay 386 healthcare services: viewing your prescriptions, viewing upcoming health events, and reviewing your health records.</p>
         </div>
 
         <div class="guide-section-minimal">
@@ -353,7 +386,7 @@
           <div class="guide-minimal-faq">
             <div class="guide-faq-card">
               <div class="guide-faq-q">Are consultations and medications free for residents?</div>
-              <p class="guide-faq-a">Yes. All medical consultations and dispensary medications provided by Barangay 603 are completely free of charge for registered residents.</p>
+              <p class="guide-faq-a">Yes. All medical consultations and dispensary medications provided by Barangay 386 are completely free of charge for registered residents.</p>
             </div>
             <div class="guide-faq-card">
               <div class="guide-faq-q">What should I bring when claiming my fulfilled medicines?</div>
@@ -371,16 +404,55 @@
     <section class="view" id="view-profile" hidden>
       <div class="section-card">
         <h2>Profile Settings</h2>
-        <p class="section-sub">Your account information.</p>
+        <p class="section-sub">Your account information for the Barangay 386 LINKod Portal.</p>
+
+        <div class="profile-summary-card">
+          <div class="profile-summary-user">
+            <div class="profile-summary-avatar" id="profile-avatar" aria-hidden="true">RL</div>
+            <div class="profile-summary-text">
+              <p class="profile-summary-name" id="profile-display-name">Resident</p>
+              <p class="profile-summary-handle" id="profile-handle">-</p>
+            </div>
+          </div>
+          <span class="role-badge">PATIENT/RESIDENT</span>
+        </div>
+
         <div class="profile-fields">
           <div class="profile-field">
-            <label>Username</label>
+            <span class="profile-field-label">Display Name</span>
+            <div class="field-value chip-name">-</div>
+          </div>
+          <div class="profile-field">
+            <span class="profile-field-label">Username</span>
             <div class="field-value" id="profile-username">-</div>
           </div>
           <div class="profile-field">
-            <label>Role</label>
+            <span class="profile-field-label">Role</span>
             <div class="field-value" id="profile-role">-</div>
           </div>
+          <div class="profile-field">
+            <span class="profile-field-label">Health Center</span>
+            <div class="field-value">Barangay 386 Health Center, Manila</div>
+          </div>
+        </div>
+
+        <div class="profile-footer-bar">
+          <p class="profile-footer-note">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="16" x2="12" y2="12"></line>
+              <line x1="12" y1="8" x2="12.01" y2="8"></line>
+            </svg>
+            <span>To update your account details or password, please visit Barangay 386 Health Center.</span>
+          </p>
+          <button type="button" class="ghost-btn profile-logout-btn" data-action="logout">
+            <svg class="btn-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+              <polyline points="16 17 21 12 16 7"></polyline>
+              <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+            <span>Log out</span>
+          </button>
         </div>
       </div>
     </section>
@@ -388,7 +460,52 @@
   </main>
 </div>
 
-<div class="toast" id="toast"></div>
+<dialog id="privacy-consent-dialog" class="privacy-dialog" closedby="none" aria-labelledby="privacy-dialog-title">
+  <div class="privacy-dialog-header">
+    <div class="privacy-dialog-icon" aria-hidden="true">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+        <path d="m9 12 2 2 4-4"></path>
+      </svg>
+    </div>
+    <div class="privacy-dialog-heading-group">
+      <h1 id="privacy-dialog-title">Data Privacy Notice</h1>
+      <p class="privacy-dialog-law">Barangay 386 Health Center &middot; Republic Act No. 10173</p>
+    </div>
+  </div>
+
+  <div class="privacy-dialog-body">
+    <p>
+      Under the <strong>Data Privacy Act of 2012 (RA 10173)</strong>, Barangay 386 Health Center respects your right to privacy and protects all personal and health records stored in the LINKod Portal.
+    </p>
+    <ul class="privacy-points">
+      <li>
+        <strong>Information kept on file:</strong> Your name, birthdate, home address, contact number, medical history, and prescriptions recorded by our clinic staff.
+      </li>
+      <li>
+        <strong>Purpose:</strong> Used only to manage your barangay health records, show your prescriptions, and share health center event updates.
+      </li>
+      <li>
+        <strong>Confidentiality:</strong> Your personal information is strictly confidential and will not be shared, sold, or disclosed to anyone outside authorized Barangay 386 Health Center staff, unless required by law.
+      </li>
+    </ul>
+    <p class="privacy-dialog-note">
+      You may visit the Barangay 386 Health Center anytime to review or request corrections to your information.
+    </p>
+
+    <label class="privacy-check-box" for="privacy-consent-checkbox">
+      <input type="checkbox" id="privacy-consent-checkbox" autofocus>
+      <span>I have read and understood this Data Privacy Notice, and I agree that Barangay 386 Health Center may keep and use my personal information for my health records.</span>
+    </label>
+  </div>
+
+  <div class="privacy-dialog-actions">
+    <button type="button" id="privacy-decline-btn" class="ghost-btn">Decline and log out</button>
+    <button type="button" id="privacy-accept-btn" class="primary-btn" disabled>Accept and continue</button>
+  </div>
+</dialog>
+
+<div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
 
 <script src="/shared/js/data.js"></script>
 <script src="/shared/js/calendar.js"></script>
